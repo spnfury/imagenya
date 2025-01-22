@@ -12,6 +12,7 @@ if (process.env.UPSTASH_REDIS_REST_URL) {
   ratelimit = new Ratelimit({
     redis: Redis.fromEnv(),
     // Allow 60 requests per day (~4-6 prompts), then need to use API key
+    // change to 5 / day
     limiter: Ratelimit.fixedWindow(60, "1440 m"),
     analytics: true,
     prefix: "loras-dev",
@@ -21,12 +22,13 @@ if (process.env.UPSTASH_REDIS_REST_URL) {
 let requestSchema = z.object({
   prompt: z.string(),
   lora: z.string(),
+  shouldRefine: z.boolean(),
   userAPIKey: z.string().optional(),
 });
 
 export async function POST(req: Request) {
   let json = await req.json();
-  let { prompt, userAPIKey, lora } = requestSchema.parse(json);
+  let { prompt, userAPIKey, lora, shouldRefine } = requestSchema.parse(json);
 
   // Add observability if a Helicone key is specified, otherwise skip
   // TODO
@@ -70,20 +72,25 @@ export async function POST(req: Request) {
     );
   }
 
-  const improvedPrompt = await improvePrompt({
+  const improvedPrompt = await refinePrompt({
     prompt,
     lora: selectedLora,
     client,
   });
   const untouchedPrompt = selectedLora.applyTrigger(prompt);
 
+  const promptToUse = shouldRefine ? improvedPrompt : untouchedPrompt;
+
   console.log("Untouched prompt:", untouchedPrompt);
   console.log("Improved prompt:", improvedPrompt);
+
+  let height = selectedLora.height ?? 768;
+  let width = selectedLora.width ?? 1024;
 
   let response;
   try {
     response = await client.images.create({
-      prompt: normalPrompt,
+      prompt: promptToUse,
       // prompt: improvedPrompt,
       // prompt:
       //   "denim dark blue 5-pocket ankle-length jeans in washed stretch denim slightly looser fit with a wide waist panel for best fit over the tummy and tapered legs with raw-edge frayed hems",
@@ -97,10 +104,8 @@ export async function POST(req: Request) {
       // prompt,
       // model: "black-forest-labs/FLUX.1-schnell",
       model: "black-forest-labs/FLUX.1-dev-lora",
-      // model: "black-forest-labs/FLUX.1-dev",
-      width: 1024,
-      // height: 1024,
-      height: 768,
+      width,
+      height,
       seed: 1234,
       steps: selectedLora.steps,
       // guidance: 3.5,
@@ -113,35 +118,36 @@ export async function POST(req: Request) {
       path: selectedLora.path,
       scale: selectedLora.scale,
     });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.log(e);
     return Response.json(
-      { error: e.toString() },
+      { error: e instanceof Error ? e.toString() : "Unknown error" },
       {
         status: 500,
       },
     );
   }
 
-  return Response.json(response.data[0]);
+  return Response.json({
+    prompt: promptToUse,
+    image: response.data[0],
+  });
 }
 
 export const runtime = "edge";
 
-function getIPAddress() {
-  const FALLBACK_IP_ADDRESS = "0.0.0.0";
-  const forwardedFor = headers().get("x-forwarded-for");
+// function getIPAddress() {
+//   const FALLBACK_IP_ADDRESS = "0.0.0.0";
+//   const forwardedFor = headers().get("x-forwarded-for");
 
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0] ?? FALLBACK_IP_ADDRESS;
-  }
+//   if (forwardedFor) {
+//     return forwardedFor.split(",")[0] ?? FALLBACK_IP_ADDRESS;
+//   }
 
-  return headers().get("x-real-ip") ?? FALLBACK_IP_ADDRESS;
-}
+//   return headers().get("x-real-ip") ?? FALLBACK_IP_ADDRESS;
+// }
 
-async function improvePrompt({
+async function refinePrompt({
   prompt,
   lora,
   client,
@@ -150,17 +156,20 @@ async function improvePrompt({
   lora: Lora;
   client: Together;
 }) {
+  if (!lora.refinement) {
+    return lora.applyTrigger(prompt);
+  }
+
   try {
     let res = await client.chat.completions.create({
       model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
       messages: [
         {
           role: "system",
-          content: `You are an bot that helps refine prompts passed to the ${lora.model} image generation model. Only respond with the improved prompt and nothing else. Be as terse as possible.`,
+          content: `Your task is to help refine prompts that will be passed to an image generation model. ${lora.refinement}. Only respond with the improved prompt and nothing else. Be as terse as possible, do not include quotes.`,
         },
         {
           role: "user",
-          // NOTE/TODO: asking it to apply the trigger word messes up, can influence the prompt too much
           content: `Write a more detailed prompt about "${prompt}"`,
         },
       ],

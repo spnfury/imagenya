@@ -21,6 +21,7 @@ export type Lora = {
   applyTrigger: (prompt: string) => string;
   scale: number;
   steps: number;
+  refinement?: string | boolean;
   height?: number;
   width?: number;
 };
@@ -35,8 +36,10 @@ export const LORAS: Lora[] = [
     image: Icons,
     path: "https://huggingface.co/strangerzonehf/Flux-Icon-Kit-LoRA",
     applyTrigger: (prompt) => `Icon Kit, ${prompt}`,
+    refinement:
+      "Refine the prompt so that it describes an icon that can be used in UI/UX projects. Do not ask for multiple icons.",
     scale: 1,
-    steps: 28,
+    steps: 33,
     height: 832,
     width: 1280,
   },
@@ -49,6 +52,8 @@ export const LORAS: Lora[] = [
     image: LogoDesign,
     path: "https://huggingface.co/Shakker-Labs/FLUX.1-dev-LoRA-Logo-Design",
     applyTrigger: (prompt) => `wablogo, logo, Minimalist, ${prompt}`,
+    refinement:
+      "Refine the prompt so that it describes a professional and minimalist logo. If the prompt describes two items, then just return those two items.",
     scale: 0.8,
     steps: 28,
   },
@@ -61,8 +66,12 @@ export const LORAS: Lora[] = [
     image: ColoredSketch,
     path: "https://huggingface.co/strangerzonehf/Flux-Sketch-Ep-LoRA",
     applyTrigger: (prompt) => `ep sketch, ${prompt}`,
+    refinement:
+      "Refine the prompt so that it describes a vibrant, colorful, sketch illustration.",
     scale: 1,
-    steps: 28,
+    steps: 33,
+    height: 832,
+    width: 1280,
   },
   {
     id: 7,
@@ -70,10 +79,12 @@ export const LORAS: Lora[] = [
     model: "Flux-Midjourney-Mix2-LoRA",
     url: "https://huggingface.co/strangerzonehf/Flux-Midjourney-Mix2-LoRA",
     description:
-      "Mimics MidJourney’s style, blending intricate and artistic designs.",
+      "Mimics MidJourney's style, blending intricate and artistic designs.",
     image: FluxMidJourney,
     path: "https://huggingface.co/strangerzonehf/Flux-Midjourney-Mix2-LoRA",
     applyTrigger: (prompt) => `MJ v6, ${prompt}`,
+    refinement:
+      "Refine that prompt so it mimics MidJourney's style, blending intricate and artistic designs. Edit for photorealism and close-up shots.",
     scale: 1,
     steps: 28,
   },
@@ -88,6 +99,8 @@ export const LORAS: Lora[] = [
     image: OutfitGenerator,
     path: "https://huggingface.co/tryonlabs/FLUX.1-dev-LoRA-Outfit-Generator",
     applyTrigger: (prompt) => prompt,
+    refinement:
+      "Change the prompt does that it describes a piece of clothing. You need to include each of the following details: color, pattern, fit, style, material, and type.",
     scale: 1,
     steps: 28,
   },
@@ -101,6 +114,7 @@ export const LORAS: Lora[] = [
     path: "https://huggingface.co/dvyio/flux-lora-simple-illustration",
     applyTrigger: (prompt) =>
       `${prompt}, illustration in the style of SMPL, thick black lines on a white background`,
+    refinement: false,
     scale: 1,
     steps: 28,
   },
@@ -115,6 +129,8 @@ export const LORAS: Lora[] = [
     path: "https://huggingface.co/mujibanget/vector-illustration",
     applyTrigger: (prompt) =>
       `${prompt}, vector illustration with mujibvector style`,
+    refinement:
+      "Refine the prompt so that it describes a smooth, scalable vector-style sketch that is ideal for digital designs.",
     scale: 1,
     steps: 28,
   },
@@ -126,7 +142,8 @@ export const LORAS: Lora[] = [
     url: "https://huggingface.co/Datou1111/shou_xin",
     image: PencilSketch,
     path: "https://huggingface.co/hassanelmghari/shou_xin",
-    applyTrigger: (prompt) => `shou_xin, A pencil sketch of ${prompt}`,
+    applyTrigger: (prompt) => `shou_xin, pencil sketch ${prompt}`,
+    refinement: false,
     scale: 1,
     steps: 28,
   },
@@ -139,7 +156,9 @@ export const LORAS: Lora[] = [
     url: "https://huggingface.co/glif/anime-blockprint-style",
     image: AnimeSketch,
     path: "https://huggingface.co/glif/anime-blockprint-style",
-    applyTrigger: (prompt) => `${prompt}, blockprint style`,
+    applyTrigger: (prompt) => `${prompt} blockprint style`,
+    refinement:
+      "Refine the prompt so that it combines anime inspired designs with textured block print aesthetics. The refinement should only include a description that would exist in both anime and block print.",
     scale: 1,
     steps: 28,
   },
@@ -153,6 +172,7 @@ export const LORAS: Lora[] = [
     path: "https://huggingface.co/multimodalart/flux-tarot-v1",
     applyTrigger: (prompt) =>
       `${prompt} in the style of TOK a trtcrd tarot style`,
+    refinement: false,
     scale: 1,
     steps: 28,
   },

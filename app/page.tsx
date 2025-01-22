@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import imagePlaceholder from "@/public/image-placeholder.png";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { useQuery } from "@tanstack/react-query";
-import { useDebounce } from "@uidotdev/usehooks";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Lora, LORAS } from "@/data/loras";
@@ -30,49 +29,9 @@ export default function Home() {
     }
     return "";
   });
-  const [selectedStyleValue, setSelectedStyleValue] = useState("");
   const [selectedLoraModel, setSelectedLoraModel] = useState<Lora["model"]>();
-  const debouncedPrompt = useDebounce(prompt, 350);
-  const [generations, setGenerations] = useState<
-    { prompt: string; image: ImageResponse }[]
-  >([]);
-  let [activeIndex, setActiveIndex] = useState<number>();
 
-  const { data: image, isFetching } = useQuery({
-    placeholderData: (previousData) => previousData,
-    queryKey: [debouncedPrompt + selectedStyleValue],
-    queryFn: async () => {
-      let res = await fetch("/api/generateImages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-          lora: selectedLoraModel,
-          userAPIKey,
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error(await res.text());
-      }
-      return (await res.json()) as ImageResponse;
-    },
-    enabled: !!(debouncedPrompt.trim() && selectedLoraModel),
-    staleTime: Infinity,
-    retry: false,
-  });
-
-  let isDebouncing = prompt !== debouncedPrompt;
-
-  useEffect(() => {
-    if (image && !generations.map((g) => g.image).includes(image)) {
-      setGenerations((images) => [...images, { prompt, image }]);
-      setActiveIndex(generations.length);
-    }
-  }, [generations, image, prompt]);
-
+  // TODO fix
   useEffect(() => {
     if (userAPIKey) {
       localStorage.setItem("togetherApiKey", userAPIKey);
@@ -81,8 +40,12 @@ export default function Home() {
     }
   }, [userAPIKey]);
 
-  let activeImage =
-    activeIndex !== undefined ? generations[activeIndex].image : undefined;
+  const isSubmitting = false;
+
+  async function action(formData: FormData) {
+    let { prompt } = Object.fromEntries(formData.entries());
+    setPrompt(typeof prompt === "string" ? prompt : "");
+  }
 
   return (
     <div className="flex h-full flex-col px-5">
@@ -114,24 +77,32 @@ export default function Home() {
       </header>
 
       <div className="flex justify-center">
-        <form className="mt-10 w-full max-w-5xl">
+        <form className="mt-10 w-full max-w-5xl" action={action}>
           <fieldset>
             <div className="mx-auto w-full max-w-lg">
               <div className="relative">
                 <Textarea
+                  name="prompt"
                   rows={4}
                   spellCheck={false}
                   placeholder="Describe your image..."
                   required
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
+                  defaultValue={prompt}
                   className="w-full resize-none border-gray-300 border-opacity-50 bg-gray-400 px-4 text-base placeholder-gray-300"
                 />
                 <div
-                  className={`${isFetching || isDebouncing ? "flex" : "hidden"} absolute bottom-3 right-3 items-center justify-center`}
+                  className={`${isSubmitting ? "flex" : "hidden"} absolute bottom-3 right-3 items-center justify-center`}
                 >
                   <Spinner className="size-4" />
                 </div>
+              </div>
+              <div className="mt-3 flex justify-end">
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center bg-gray-900 px-2 py-1 text-sm font-medium text-white"
+                >
+                  Create image
+                </button>
               </div>
             </div>
             <div className="mt-12">
@@ -179,7 +150,19 @@ export default function Home() {
         </form>
       </div>
 
-      <div className="flex w-full grow flex-col items-center justify-center pb-8 pt-4 text-center">
+      {prompt && selectedLoraModel && (
+        <div className="grid grid-cols-2">
+          <GeneratedImage prompt={prompt} loraModel={selectedLoraModel} />
+
+          <GeneratedImage
+            prompt={prompt}
+            loraModel={selectedLoraModel}
+            refinePrompt
+          />
+        </div>
+      )}
+
+      {/* <div className="flex w-full grow flex-col items-center justify-center pb-8 pt-4 text-center">
         {!activeImage || !prompt ? (
           <div className="max-w-xl md:max-w-4xl lg:max-w-3xl">
             <p className="text-xl font-semibold text-gray-200 md:text-3xl lg:text-4xl">
@@ -225,7 +208,7 @@ export default function Home() {
             </div>
           </div>
         )}
-      </div>
+      </div> */}
 
       <footer className="mt-16 w-full items-center pb-10 text-center text-gray-300 md:mt-4 md:flex md:justify-between md:pb-5 md:text-xs lg:text-sm">
         <p>
@@ -284,5 +267,68 @@ export default function Home() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function GeneratedImage({
+  prompt,
+  loraModel,
+  refinePrompt,
+}: {
+  prompt: string;
+  loraModel: string;
+  refinePrompt?: boolean;
+}) {
+  const shouldRefine = !!refinePrompt;
+  const { data, isFetching } = useQuery<{
+    prompt: string;
+    image: ImageResponse;
+  }>({
+    placeholderData: (previousData) => previousData,
+    queryKey: [prompt, loraModel, shouldRefine],
+    queryFn: async () => {
+      let res = await fetch("/api/generateImages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+          lora: loraModel,
+          shouldRefine,
+          // userAPIKey,
+        }),
+      });
+
+      if (!res.ok) {
+        const message = await res.text();
+        throw new Error(message);
+      }
+
+      return res.json();
+    },
+    enabled: !!(prompt.trim() && loraModel),
+    staleTime: Infinity,
+    retry: false,
+  });
+
+  return (
+    <>
+      {data && (
+        <div>
+          <div>{refinePrompt ? "Refined prompt" : "Unrefined prompt"}</div>
+          <div>{data.prompt}</div>
+          <Image
+            placeholder="blur"
+            blurDataURL={imagePlaceholder.blurDataURL}
+            width={1024}
+            height={768}
+            src={`data:image/png;base64,${data.image.b64_json}`}
+            alt=""
+            className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg object-cover shadow-sm shadow-black`}
+          />
+        </div>
+      )}
+    </>
   );
 }
