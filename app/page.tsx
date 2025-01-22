@@ -1,41 +1,20 @@
 "use client";
 
-import CheckIcon from "@/components/icons/check-icon";
 import GithubIcon from "@/components/icons/github-icon";
-import PictureIcon from "@/components/icons/picture-icon";
 import XIcon from "@/components/icons/x-icon";
 import Logo from "@/components/logo";
 import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import imagePlaceholder from "@/public/image-placeholder.png";
-import cinematicImage from "@/public/styles/cinematic.png";
-import fantasyImage from "@/public/styles/fantasy.png";
-import minimalImage from "@/public/styles/minimal.png";
-import moodyImage from "@/public/styles/moody.png";
-import popArtImage from "@/public/styles/pop-art.png";
-import retroImage from "@/public/styles/retro.png";
-import vibrantImage from "@/public/styles/vibrant.png";
-import watercolorImage from "@/public/styles/watercolor.png";
-import artDecoImage from "@/public/styles/art-deco.jpeg";
-import cyberpunkImage from "@/public/styles/cyberpunk.jpeg";
-import grafitiImage from "@/public/styles/grafiti.jpeg";
-import surrealImage from "@/public/styles/surreal.jpeg";
-
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Lora, LORAS } from "@/data/loras";
+import { ExternalLink } from "lucide-react";
 
 type ImageResponse = {
   b64_json: string;
@@ -44,7 +23,6 @@ type ImageResponse = {
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
-  const [iterativeMode, setIterativeMode] = useState(false);
   const [userAPIKey, setUserAPIKey] = useState(() => {
     // Only run in browser
     if (typeof window !== "undefined") {
@@ -53,13 +31,12 @@ export default function Home() {
     return "";
   });
   const [selectedStyleValue, setSelectedStyleValue] = useState("");
+  const [selectedLoraModel, setSelectedLoraModel] = useState<Lora["model"]>();
   const debouncedPrompt = useDebounce(prompt, 350);
   const [generations, setGenerations] = useState<
     { prompt: string; image: ImageResponse }[]
   >([]);
   let [activeIndex, setActiveIndex] = useState<number>();
-
-  const selectedStyle = imageStyles.find((s) => s.value === selectedStyleValue);
 
   const { data: image, isFetching } = useQuery({
     placeholderData: (previousData) => previousData,
@@ -72,9 +49,8 @@ export default function Home() {
         },
         body: JSON.stringify({
           prompt,
-          style: imagePrompts[selectedStyleValue],
+          lora: selectedLoraModel,
           userAPIKey,
-          iterativeMode,
         }),
       });
 
@@ -83,7 +59,7 @@ export default function Home() {
       }
       return (await res.json()) as ImageResponse;
     },
-    enabled: !!debouncedPrompt.trim(),
+    enabled: !!(debouncedPrompt.trim() && selectedLoraModel),
     staleTime: Infinity,
     retry: false,
   });
@@ -138,96 +114,66 @@ export default function Home() {
       </header>
 
       <div className="flex justify-center">
-        <form className="mt-10 w-full max-w-lg">
+        <form className="mt-10 w-full max-w-5xl">
           <fieldset>
-            <div className="relative">
-              <Textarea
-                rows={4}
-                spellCheck={false}
-                placeholder="Describe your image..."
-                required
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                className="w-full resize-none border-gray-300 border-opacity-50 bg-gray-400 px-4 text-base placeholder-gray-300"
-              />
-              <div
-                className={`${isFetching || isDebouncing ? "flex" : "hidden"} absolute bottom-3 right-3 items-center justify-center`}
-              >
-                <Spinner className="size-4" />
+            <div className="mx-auto w-full max-w-lg">
+              <div className="relative">
+                <Textarea
+                  rows={4}
+                  spellCheck={false}
+                  placeholder="Describe your image..."
+                  required
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  className="w-full resize-none border-gray-300 border-opacity-50 bg-gray-400 px-4 text-base placeholder-gray-300"
+                />
+                <div
+                  className={`${isFetching || isDebouncing ? "flex" : "hidden"} absolute bottom-3 right-3 items-center justify-center`}
+                >
+                  <Spinner className="size-4" />
+                </div>
               </div>
             </div>
-            <div className="mt-3 flex items-center justify-end gap-1.5 text-sm md:text-right">
-              <div>
-                <label
-                  title="Use earlier images as references"
-                  className="inline-flex cursor-pointer items-center gap-2 rounded border-[0.5px] border-gray-350 bg-gray-500 px-2 py-1.5 shadow shadow-black"
-                >
-                  <input
-                    type="checkbox"
-                    className="accent-white"
-                    checked={iterativeMode}
-                    onChange={() => {
-                      setIterativeMode(!iterativeMode);
-                    }}
-                  />
-                  Consistency Mode
-                </label>
-              </div>
-              <div>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button
-                      type="button"
-                      className="inline-flex items-center justify-center gap-1.5 rounded-sm border-[0.5px] border-gray-350 bg-gray-400 px-2 py-1.5 text-gray-200"
+            <div className="mt-12">
+              <RadioGroup.Root
+                name="lora"
+                value={selectedLoraModel}
+                onValueChange={setSelectedLoraModel}
+              >
+                <div className="grid auto-rows-auto grid-cols-5 gap-5">
+                  {LORAS.map((lora) => (
+                    <RadioGroup.Item
+                      key={lora.id}
+                      value={lora.model}
+                      className="relative flex flex-col justify-start"
                     >
-                      <PictureIcon className="size-[12px]" />
-                      {selectedStyle
-                        ? `Style: ${selectedStyle.label}`
-                        : "Styles"}
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="p-10">
-                    <DialogHeader>
-                      <DialogTitle>Select a style</DialogTitle>
-                      <DialogDescription>
-                        Select a style to instantly transform your shots and
-                        bring out the best in your creative ideas.{" "}
-                        <span className="text-gray-350">
-                          Experiment, explore, and make it yours!
-                        </span>
-                      </DialogDescription>
-                    </DialogHeader>
-                    <RadioGroup.Root
-                      value={selectedStyleValue}
-                      onValueChange={setSelectedStyleValue}
-                      className="grid grid-cols-2 gap-2 md:grid-cols-4"
-                    >
-                      {imageStyles.map((style) => (
-                        <RadioGroup.Item
-                          value={style.value}
-                          className="group relative"
-                          key={style.value}
-                        >
+                      {lora.model === selectedLoraModel && (
+                        <div className="absolute -inset-2 rounded-[6px] border-[1.5px] border-black bg-white" />
+                      )}
+                      <div className="relative">
+                        <div className="relative">
                           <Image
-                            src={style.image}
-                            sizes="(max-width: 768px) 50vw, 150px"
-                            alt={style.label}
-                            className="aspect-square rounded transition group-data-[state=checked]:opacity-100 group-data-[state=unchecked]:opacity-50"
+                            className="aspect-[3/2] rounded-[4px] object-cover object-center"
+                            src={lora.image}
+                            alt={lora.name}
                           />
-                          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/75 to-transparent p-2">
-                            <p className="text-xs font-bold text-white">
-                              {style.label}
-                            </p>
-                            <RadioGroup.Indicator className="inline-flex size-[14px] items-center justify-center rounded-full bg-white">
-                              <CheckIcon />
-                            </RadioGroup.Indicator>
+                          <div className="absolute inset-0 rounded-[4px] ring-1 ring-inset ring-slate-400/20" />
+                        </div>
+                        <div>{lora.model}</div>
+                        <div className="flex items-center space-x-1.5">
+                          <h3>{lora.name}</h3>
+                          <div>
+                            <a href={lora.url} target="_blank">
+                              <ExternalLink className="size-3" />
+                            </a>
                           </div>
-                        </RadioGroup.Item>
-                      ))}
-                    </RadioGroup.Root>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                        </div>
+                        <p>{lora.description}</p>
+                      </div>
+                    </RadioGroup.Item>
+                  ))}
+                </div>
+              </RadioGroup.Root>
             </div>
           </fieldset>
         </form>
@@ -340,98 +286,3 @@ export default function Home() {
     </div>
   );
 }
-
-const imageStyles = [
-  {
-    label: "Pop Art",
-    value: "pop-art",
-    image: popArtImage,
-    prompt:
-      "Create an image in the bold and vibrant style of classic pop art, using bright primary colors, thick outlines, and a playful comic book flair. Incorporate stylized, mass-produced imagery or dotted shading for added impact.",
-  },
-  {
-    label: "Minimal",
-    value: "minimal",
-    image: minimalImage,
-    prompt:
-      "Generate a simple, clean composition with limited shapes and subtle color accents. Emphasize negative space and precise lines to achieve an elegant, understated look.",
-  },
-  {
-    label: "Retro",
-    value: "retro",
-    image: retroImage,
-    prompt:
-      "Design a vintage-inspired scene with nostalgic color palettes, distressed textures, and bold mid-century typography. Capture the essence of old posters, ads, or signs for an authentic throwback vibe.",
-  },
-  {
-    label: "Watercolor",
-    value: "watercolor",
-    image: watercolorImage,
-    prompt:
-      "Produce a delicate, painterly image emulating fluid watercolor strokes and soft gradients. Blend pastel hues and dreamy splashes to create a light, handcrafted feel.",
-  },
-  {
-    label: "Fantasy",
-    value: "fantasy",
-    image: fantasyImage,
-    prompt:
-      "Illustrate a whimsical realm filled with magical creatures, enchanted forests, and otherworldly elements. Use vibrant colors and ornate detailing to evoke a sense of wonder and adventure.",
-  },
-  {
-    label: "Moody",
-    value: "moody",
-    image: moodyImage,
-    prompt:
-      "Craft an atmospheric scene defined by dramatic lighting, deep shadows, and rich textures. Evoke emotion with subdued color tones and an underlying sense of tension.",
-  },
-  {
-    label: "Vibrant",
-    value: "vibrant",
-    image: vibrantImage,
-    prompt:
-      "Generate an energetic, eye-popping design with bold, saturated hues and dynamic contrasts. Layer vivid gradients and striking shapes for a lively, high-impact result.",
-  },
-  {
-    label: "Cinematic",
-    value: "cinematic",
-    image: cinematicImage,
-    prompt:
-      "Compose a visually stunning frame reminiscent of a movie still, complete with dramatic lighting and evocative color grading. Convey a strong sense of story through expressive angles and rich detail.",
-  },
-  {
-    label: "Cyberpunk",
-    value: "cyberpunk",
-    image: cyberpunkImage,
-    prompt:
-      "Envision a futuristic, neon-lit cityscape infused with advanced technology and dystopian undertones. Layer towering skyscrapers, holographic signage, and edgy urban elements for a gritty, high-tech aesthetic.",
-  },
-  {
-    label: "Surreal",
-    value: "Surreal",
-    image: surrealImage,
-    prompt:
-      "Construct a dreamlike world blending unexpected, fantastical elements in bizarre yet captivating ways. Use vivid colors and warped perspectives to create an otherworldly, mind-bending atmosphere.",
-  },
-  {
-    label: "Art Deco",
-    value: "art-deco",
-    image: artDecoImage,
-    prompt:
-      "Design a scene characterized by bold geometric shapes, streamlined forms, and luxe metallic accents. Channel the sophistication of the 1920s and 1930s with glamorous patterns and elegant symmetry.",
-  },
-  {
-    label: "Grafiti",
-    value: "grafiti",
-    image: grafitiImage,
-    prompt:
-      "Produce an urban-inspired piece rich with spray paint textures, edgy lettering, and vibrant color bursts. Layer paint drips, splatters, and bold typography for a raw, street-art aesthetic.",
-  },
-];
-
-const imagePrompts: Record<string, string> = imageStyles.reduce(
-  (acc, style) => ({
-    ...acc,
-    [style.value]: style.prompt,
-  }),
-  {},
-);
