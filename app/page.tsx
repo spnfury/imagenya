@@ -14,11 +14,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Lora, LORAS } from "@/data/loras";
 import { ExternalLink } from "lucide-react";
-
-type ImageResponse = {
-  b64_json: string;
-  timings: { inference: number };
-};
+import { z } from "zod";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -121,25 +117,30 @@ export default function Home() {
                       {lora.model === selectedLoraModel && (
                         <div className="absolute -inset-2 rounded-[6px] border-[1.5px] border-black bg-white" />
                       )}
-                      <div className="relative">
+
+                      <div className="relative text-left">
                         <div className="relative">
                           <Image
                             className="aspect-[3/2] rounded-[4px] object-cover object-center"
                             src={lora.image}
                             alt={lora.name}
                           />
-                          <div className="absolute inset-0 rounded-[4px] ring-1 ring-inset ring-slate-400/20" />
+                          <div className="absolute inset-0 rounded-[4px] ring-1 ring-inset ring-slate-400/30" />
                         </div>
-                        <div>{lora.model}</div>
-                        <div className="flex items-center space-x-1.5">
-                          <h3>{lora.name}</h3>
+                        <div className="mt-1 line-clamp-1 text-sm font-light text-slate-400">
+                          {lora.model}
+                        </div>
+                        <div className="mt-1 flex items-center space-x-1.5">
+                          <h3 className="text-[#314158]">{lora.name}</h3>
                           <div>
                             <a href={lora.url} target="_blank">
-                              <ExternalLink className="size-3" />
+                              <ExternalLink className="size-3.5" />
                             </a>
                           </div>
                         </div>
-                        <p>{lora.description}</p>
+                        <p className="mt-1 text-sm text-slate-400">
+                          {lora.description}
+                        </p>
                       </div>
                     </RadioGroup.Item>
                   ))}
@@ -151,64 +152,10 @@ export default function Home() {
       </div>
 
       {prompt && selectedLoraModel && (
-        <div className="grid grid-cols-2">
+        <div className="">
           <GeneratedImage prompt={prompt} loraModel={selectedLoraModel} />
-
-          <GeneratedImage
-            prompt={prompt}
-            loraModel={selectedLoraModel}
-            refinePrompt
-          />
         </div>
       )}
-
-      {/* <div className="flex w-full grow flex-col items-center justify-center pb-8 pt-4 text-center">
-        {!activeImage || !prompt ? (
-          <div className="max-w-xl md:max-w-4xl lg:max-w-3xl">
-            <p className="text-xl font-semibold text-gray-200 md:text-3xl lg:text-4xl">
-              Generate images in real-time
-            </p>
-            <p className="mt-4 text-balance text-sm text-gray-300 md:text-base lg:text-lg">
-              Enter a prompt and generate images in milliseconds as you type.
-              Powered by Flux on Together AI.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-4 flex w-full max-w-4xl flex-col justify-center">
-            <div>
-              <Image
-                placeholder="blur"
-                blurDataURL={imagePlaceholder.blurDataURL}
-                width={1024}
-                height={768}
-                src={`data:image/png;base64,${activeImage.b64_json}`}
-                alt=""
-                className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg object-cover shadow-sm shadow-black`}
-              />
-            </div>
-
-            <div className="mt-4 flex gap-4 overflow-x-scroll pb-4">
-              {generations.map((generatedImage, i) => (
-                <button
-                  key={i}
-                  className="w-32 shrink-0 opacity-50 hover:opacity-100"
-                  onClick={() => setActiveIndex(i)}
-                >
-                  <Image
-                    placeholder="blur"
-                    blurDataURL={imagePlaceholder.blurDataURL}
-                    width={1024}
-                    height={768}
-                    src={`data:image/png;base64,${generatedImage.image.b64_json}`}
-                    alt=""
-                    className="max-w-full rounded-lg object-cover shadow-sm shadow-black"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div> */}
 
       <footer className="mt-16 w-full items-center pb-10 text-center text-gray-300 md:mt-4 md:flex md:justify-between md:pb-5 md:text-xs lg:text-sm">
         <p>
@@ -270,22 +217,28 @@ export default function Home() {
   );
 }
 
+const imageResponseSchema = z.object({
+  prompt: z.string(),
+  image: z.object({
+    b64_json: z.string(),
+    timings: z.object({
+      inference: z.number(),
+    }),
+  }),
+});
+
+type ImageResponse = z.infer<typeof imageResponseSchema>;
+
 function GeneratedImage({
   prompt,
   loraModel,
-  refinePrompt,
 }: {
   prompt: string;
   loraModel: string;
-  refinePrompt?: boolean;
 }) {
-  const shouldRefine = !!refinePrompt;
-  const { data, isFetching } = useQuery<{
-    prompt: string;
-    image: ImageResponse;
-  }>({
+  const { data, isFetching } = useQuery({
     placeholderData: (previousData) => previousData,
-    queryKey: [prompt, loraModel, shouldRefine],
+    queryKey: [prompt, loraModel],
     queryFn: async () => {
       let res = await fetch("/api/generateImages", {
         method: "POST",
@@ -295,7 +248,6 @@ function GeneratedImage({
         body: JSON.stringify({
           prompt,
           lora: loraModel,
-          shouldRefine,
           // userAPIKey,
         }),
       });
@@ -305,7 +257,9 @@ function GeneratedImage({
         throw new Error(message);
       }
 
-      return res.json();
+      let data = await res.json();
+
+      return imageResponseSchema.parse(data);
     },
     enabled: !!(prompt.trim() && loraModel),
     staleTime: Infinity,
@@ -314,9 +268,10 @@ function GeneratedImage({
 
   return (
     <>
-      {data && (
+      {isFetching ? (
+        <div>Loading...</div>
+      ) : data ? (
         <div>
-          <div>{refinePrompt ? "Refined prompt" : "Unrefined prompt"}</div>
           <div>{data.prompt}</div>
           <Image
             placeholder="blur"
@@ -328,7 +283,7 @@ function GeneratedImage({
             className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg object-cover shadow-sm shadow-black`}
           />
         </div>
-      )}
+      ) : null}
     </>
   );
 }

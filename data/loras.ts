@@ -21,7 +21,7 @@ export type Lora = {
   applyTrigger: (prompt: string) => string;
   scale: number;
   steps: number;
-  refinement?: string | boolean;
+  refinement: string | boolean;
   height?: number;
   width?: number;
 };

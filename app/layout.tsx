@@ -47,12 +47,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full ${anonymousPro.variable} font-mono`}>
+    <html lang="en" className={`h-full ${anonymousPro.variable} font-sans`}>
       <head>
         <PlausibleProvider domain="blinkshot.io" />
       </head>
       <body
-        className="text-gray-900 h-full min-h-full bg-[length:6px] font-mono antialiased"
+        className="h-full min-h-full bg-[length:6px] font-sans text-gray-900 antialiased"
         style={{ backgroundImage: `url(${bgPattern.src}` }}
       >
         <Providers>{children}</Providers>

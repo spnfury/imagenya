@@ -11,9 +11,8 @@ let ratelimit: Ratelimit | undefined;
 if (process.env.UPSTASH_REDIS_REST_URL) {
   ratelimit = new Ratelimit({
     redis: Redis.fromEnv(),
-    // Allow 60 requests per day (~4-6 prompts), then need to use API key
-    // change to 5 / day
-    limiter: Ratelimit.fixedWindow(60, "1440 m"),
+    // Allow 5 requests per day, then need to use API key
+    limiter: Ratelimit.fixedWindow(5, "1440 m"),
     analytics: true,
     prefix: "loras-dev",
   });
@@ -22,13 +21,12 @@ if (process.env.UPSTASH_REDIS_REST_URL) {
 let requestSchema = z.object({
   prompt: z.string(),
   lora: z.string(),
-  shouldRefine: z.boolean(),
   userAPIKey: z.string().optional(),
 });
 
 export async function POST(req: Request) {
   let json = await req.json();
-  let { prompt, userAPIKey, lora, shouldRefine } = requestSchema.parse(json);
+  let { prompt, userAPIKey, lora } = requestSchema.parse(json);
 
   // Add observability if a Helicone key is specified, otherwise skip
   // TODO
@@ -72,51 +70,30 @@ export async function POST(req: Request) {
     );
   }
 
-  const improvedPrompt = await refinePrompt({
+  const refinedPrompt = await refinePrompt({
     prompt,
     lora: selectedLora,
     client,
   });
-  const untouchedPrompt = selectedLora.applyTrigger(prompt);
-
-  const promptToUse = shouldRefine ? improvedPrompt : untouchedPrompt;
-
-  console.log("Untouched prompt:", untouchedPrompt);
-  console.log("Improved prompt:", improvedPrompt);
-
-  let height = selectedLora.height ?? 768;
-  let width = selectedLora.width ?? 1024;
 
   let response;
   try {
     response = await client.images.create({
-      prompt: promptToUse,
-      // prompt: improvedPrompt,
-      // prompt:
-      //   "denim dark blue 5-pocket ankle-length jeans in washed stretch denim slightly looser fit with a wide waist panel for best fit over the tummy and tapered legs with raw-edge frayed hems",
-      // prompt: "solid black long-sleeved top in soft jersey",
-
-      // prompt:
-      //   "a jacket with Color: black, Department: Outer wear, Style: Elegant, Detail: Buttons, Type: Fit and Flare, Fabric-Elasticity: High Stretch, Sleeve-Length: Long, Material: Leather",
-      // prompt:
-      //   "A dress with Color: Red, Department: Dresses, Detail: Belted, Fabric-Elasticity: High Stretch, Fit: Fitted, Hemline: Flared, Material: Gabardine, Neckline: Off The Shoulder, Pattern: Floral, Sleeve-Length: Sleeveless, Style: Elegant, Type: Fit and Flare, Waistline: High",
-      // prompt: `${selectedLora.triggerWord ? `${selectedLora.triggerWord}, ` : ""} a computer`,
-      // prompt,
-      // model: "black-forest-labs/FLUX.1-schnell",
+      prompt: refinedPrompt,
       model: "black-forest-labs/FLUX.1-dev-lora",
-      width,
-      height,
+      height: selectedLora.height ?? 768,
+      width: selectedLora.width ?? 1024,
       seed: 1234,
       steps: selectedLora.steps,
       // guidance: 3.5,
       response_format: "base64",
       // @ts-expect-error asdf
-      image_loras: [{ path: selectedLora.path, scale: selectedLora.scale }],
-    });
-
-    console.log({
-      path: selectedLora.path,
-      scale: selectedLora.scale,
+      image_loras: [
+        {
+          path: selectedLora.path,
+          scale: selectedLora.scale,
+        },
+      ],
     });
   } catch (e: unknown) {
     console.log(e);
@@ -129,7 +106,7 @@ export async function POST(req: Request) {
   }
 
   return Response.json({
-    prompt: promptToUse,
+    prompt: refinedPrompt,
     image: response.data[0],
   });
 }
