@@ -46,19 +46,19 @@ export async function POST(req: Request) {
   const options = {};
   const client = new Together(options);
 
-  // if (ratelimit && !userAPIKey) {
-  //   const identifier = getIPAddress();
+  if (ratelimit && !userAPIKey) {
+    const identifier = await getIPAddress();
 
-  //   const { success } = await ratelimit.limit(identifier);
-  //   if (!success) {
-  //     return Response.json(
-  //       "No requests left. Please add your own API key or try again in 24h.",
-  //       {
-  //         status: 429,
-  //       },
-  //     );
-  //   }
-  // }
+    const { success } = await ratelimit.limit(identifier);
+    if (!success) {
+      return Response.json(
+        "No requests left. Please add your own API key or try again in 24h.",
+        {
+          status: 429,
+        },
+      );
+    }
+  }
 
   const selectedLora = LORAS.find((l) => l.model === lora);
   if (!selectedLora) {
@@ -113,16 +113,17 @@ export async function POST(req: Request) {
 
 export const runtime = "edge";
 
-// function getIPAddress() {
-//   const FALLBACK_IP_ADDRESS = "0.0.0.0";
-//   const forwardedFor = headers().get("x-forwarded-for");
+const FALLBACK_IP_ADDRESS = "0.0.0.0";
+async function getIPAddress() {
+  const h = await headers();
+  const forwardedFor = h.get("x-forwarded-for");
 
-//   if (forwardedFor) {
-//     return forwardedFor.split(",")[0] ?? FALLBACK_IP_ADDRESS;
-//   }
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0] ?? FALLBACK_IP_ADDRESS;
+  }
 
-//   return headers().get("x-real-ip") ?? FALLBACK_IP_ADDRESS;
-// }
+  return h.get("x-real-ip") ?? FALLBACK_IP_ADDRESS;
+}
 
 async function refinePrompt({
   prompt,
