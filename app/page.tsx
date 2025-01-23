@@ -2,18 +2,18 @@
 
 import GithubIcon from "@/components/icons/github-icon";
 import XIcon from "@/components/icons/x-icon";
-import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Lora, LORAS } from "@/data/loras";
 import imagePlaceholder from "@/public/image-placeholder.png";
+import logo from "@/public/logo.png";
+import { ArrowRightIcon } from "@heroicons/react/20/solid";
+import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { useQuery } from "@tanstack/react-query";
+import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Lora, LORAS } from "@/data/loras";
-import { ExternalLink } from "lucide-react";
-import logo from "@/public/logo.png";
 import { z } from "zod";
 
 export default function Home() {
@@ -54,21 +54,21 @@ export default function Home() {
             Generate AI Images with LoRAs
           </p>
         </div>
-        <div>
-          <label className="text-xs">
+        <div className="flex flex-col">
+          <label className="text-sm">
             <a
               href="https://api.together.xyz/settings/api-keys"
               target="_blank"
-              className="transition hover:text-blue-500"
+              className="inline-flex items-center gap-0.5 text-gray-700 transition hover:text-blue-500"
             >
               Together AI API Key
+              <ArrowUpRightIcon className="size-3" />
             </a>{" "}
           </label>
-          <Input
-            placeholder="API Key"
-            type="password"
+          <input
+            placeholder="Enter your API key"
             value={userAPIKey}
-            className="mt-1 bg-gray-400 text-gray-200 placeholder:text-gray-300"
+            className="mt-1 rounded border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
             onChange={(e) => setUserAPIKey(e.target.value)}
           />
         </div>
@@ -79,29 +79,29 @@ export default function Home() {
           <fieldset>
             <div className="mx-auto w-full max-w-lg">
               <div className="relative">
-                <Textarea
+                <textarea
                   name="prompt"
                   rows={4}
                   spellCheck={false}
                   placeholder="Describe your image..."
                   required
                   defaultValue={prompt}
-                  className="w-full resize-none border-gray-300 border-opacity-50 bg-gray-400 px-4 text-base placeholder-gray-300"
+                  className="block w-full resize-none rounded border border-gray-300 bg-white px-4 py-3 text-base text-gray-600 placeholder-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
                 />
-                <div
-                  className={`${isSubmitting ? "flex" : "hidden"} absolute bottom-3 right-3 items-center justify-center`}
-                >
-                  <Spinner className="size-4" />
+                <div className="absolute bottom-2 right-2 flex">
+                  <button
+                    type="submit"
+                    className="inline-flex size-7 items-center justify-center rounded-[2px] bg-cyan-600 text-white hover:bg-cyan-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
+                  >
+                    <ArrowRightIcon className="size-4" />
+                  </button>
                 </div>
               </div>
-              <div className="mt-3 flex justify-end">
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center bg-gray-900 px-2 py-1 text-sm font-medium text-white"
-                >
-                  Create image
-                </button>
-              </div>
+              <p className="mt-2 text-sm text-gray-500">
+                Choose from expertly crafted styles or bring your own LoRA.
+                Enter your prompt, select a style, and bring your imagination to
+                life.
+              </p>
             </div>
             <div className="mt-12">
               <RadioGroup.Root
