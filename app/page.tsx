@@ -45,7 +45,7 @@ export default function Home() {
 
   return (
     <div className="flex h-full flex-col px-5">
-      <header className="flex justify-center pt-20 md:justify-end md:pt-3">
+      <header className="flex justify-start pt-20 md:pt-3">
         <div className="absolute left-1/2 top-6 -translate-x-1/2">
           <a href="https://togetherai.link" target="_blank">
             <Image alt="" className="h-8 w-auto" src={logo} />
@@ -56,13 +56,12 @@ export default function Home() {
         </div>
         <div>
           <label className="text-xs">
-            [Optional] Add your{" "}
             <a
               href="https://api.together.xyz/settings/api-keys"
               target="_blank"
-              className="underline underline-offset-4 transition hover:text-blue-500"
+              className="transition hover:text-blue-500"
             >
-              Together API Key
+              Together AI API Key
             </a>{" "}
           </label>
           <Input
