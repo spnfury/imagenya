@@ -2,7 +2,6 @@
 
 import GithubIcon from "@/components/icons/github-icon";
 import XIcon from "@/components/icons/x-icon";
-import Logo from "@/components/logo";
 import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +13,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Lora, LORAS } from "@/data/loras";
 import { ExternalLink } from "lucide-react";
+import logo from "@/public/logo.png";
 import { z } from "zod";
 
 export default function Home() {
@@ -48,11 +48,14 @@ export default function Home() {
       <header className="flex justify-center pt-20 md:justify-end md:pt-3">
         <div className="absolute left-1/2 top-6 -translate-x-1/2">
           <a href="https://togetherai.link" target="_blank">
-            <Logo />
+            <Image alt="" className="h-8 w-auto" src={logo} />
           </a>
+          <p className="font-mono text-gray-600">
+            Generate AI Images with LoRAs
+          </p>
         </div>
         <div>
-          <label className="text-xs text-gray-200">
+          <label className="text-xs">
             [Optional] Add your{" "}
             <a
               href="https://api.together.xyz/settings/api-keys"

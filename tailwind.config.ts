@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 import defaultTheme from "tailwindcss/defaultTheme";
+import colors from "tailwindcss/colors";
 
 const config: Config = {
   content: [
@@ -17,6 +18,7 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        gray: colors.slate,
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

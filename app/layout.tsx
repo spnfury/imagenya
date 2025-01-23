@@ -1,5 +1,4 @@
 import Providers from "@/app/providers";
-import bgPattern from "@/public/bg-pattern-transparent.png";
 import type { Metadata } from "next";
 import PlausibleProvider from "next-plausible";
 import { Anonymous_Pro } from "next/font/google";
@@ -49,12 +48,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full ${anonymousPro.variable} font-sans`}>
       <head>
-        <PlausibleProvider domain="blinkshot.io" />
+        <PlausibleProvider domain="loras.dev" />
       </head>
-      <body
-        className="h-full min-h-full bg-[length:6px] font-sans text-gray-900 antialiased"
-        style={{ backgroundImage: `url(${bgPattern.src}` }}
-      >
+      <body className="h-full min-h-full bg-gray-100 font-sans text-gray-900 antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
