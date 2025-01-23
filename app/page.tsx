@@ -121,7 +121,7 @@ export default function Home() {
                       <div className="relative text-left">
                         <div className="relative">
                           <Image
-                            className="aspect-[3/2] rounded-[4px] object-cover object-center"
+                            className="aspect-[37/24] rounded-[4px] object-cover object-center"
                             src={lora.image}
                             alt={lora.name}
                           />
