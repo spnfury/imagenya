@@ -24,6 +24,7 @@ export type Lora = {
   refinement: string | boolean;
   height?: number;
   width?: number;
+  suggestions: { prompt: string; label: string }[];
 };
 
 export const LORAS: Lora[] = [
@@ -42,6 +43,11 @@ export const LORAS: Lora[] = [
     steps: 33,
     height: 832,
     width: 1280,
+    suggestions: [
+      { label: "Flaming red torch", prompt: "A flaming red torch" },
+      { label: "Brown briefcase", prompt: "A brown briefcase" },
+      { label: "Snow globe", prompt: "A snow globe" },
+    ],
   },
   {
     id: 6,
@@ -56,6 +62,7 @@ export const LORAS: Lora[] = [
       "Refine the prompt so that it describes a professional and minimalist logo. If the prompt describes two items, then just return those two items.",
     scale: 0.8,
     steps: 28,
+    suggestions: [{ label: "Cat and flame", prompt: "cat and flame" }],
   },
   {
     id: 1,
@@ -72,6 +79,10 @@ export const LORAS: Lora[] = [
     steps: 33,
     height: 832,
     width: 1280,
+    suggestions: [
+      { label: "Albert Einstein", prompt: "Albert Einstein" },
+      { label: "New York City", prompt: "New York City" },
+    ],
   },
   {
     id: 7,
@@ -87,6 +98,7 @@ export const LORAS: Lora[] = [
       "Refine that prompt so it mimics MidJourney's style, blending intricate and artistic designs. Edit for photorealism and close-up shots.",
     scale: 1,
     steps: 28,
+    suggestions: [{ label: "A flaming red torch", prompt: "" }],
   },
 
   {
@@ -103,6 +115,11 @@ export const LORAS: Lora[] = [
       "Change the prompt does that it describes a piece of clothing. You need to include each of the following details: color, pattern, fit, style, material, and type.",
     scale: 1,
     steps: 28,
+    suggestions: [
+      { label: "A flaming red torch", prompt: "" },
+      { label: "A brown briefcase", prompt: "" },
+      { label: "A snow globe", prompt: "" },
+    ],
   },
   {
     id: 2,
@@ -117,6 +134,11 @@ export const LORAS: Lora[] = [
     refinement: false,
     scale: 1,
     steps: 28,
+    suggestions: [
+      { label: "A flaming red torch", prompt: "" },
+      { label: "A brown briefcase", prompt: "" },
+      { label: "A snow globe", prompt: "" },
+    ],
   },
   {
     id: 3,
@@ -133,6 +155,11 @@ export const LORAS: Lora[] = [
       "Refine the prompt so that it describes a smooth, scalable vector-style sketch that is ideal for digital designs.",
     scale: 1,
     steps: 28,
+    suggestions: [
+      { label: "A flaming red torch", prompt: "" },
+      { label: "A brown briefcase", prompt: "" },
+      { label: "A snow globe", prompt: "" },
+    ],
   },
   {
     id: 4,
@@ -146,6 +173,11 @@ export const LORAS: Lora[] = [
     refinement: false,
     scale: 1,
     steps: 28,
+    suggestions: [
+      { label: "A flaming red torch", prompt: "" },
+      { label: "A brown briefcase", prompt: "" },
+      { label: "A snow globe", prompt: "" },
+    ],
   },
   {
     id: 5,
@@ -161,6 +193,11 @@ export const LORAS: Lora[] = [
       "Refine the prompt so that it combines anime inspired designs with textured block print aesthetics. The refinement should only include a description that would exist in both anime and block print.",
     scale: 1,
     steps: 28,
+    suggestions: [
+      { label: "A flaming red torch", prompt: "" },
+      { label: "A brown briefcase", prompt: "" },
+      { label: "A snow globe", prompt: "" },
+    ],
   },
   {
     id: 10,
@@ -175,5 +212,10 @@ export const LORAS: Lora[] = [
     refinement: false,
     scale: 1,
     steps: 28,
+    suggestions: [
+      { label: "A flaming red torch", prompt: "" },
+      { label: "A brown briefcase", prompt: "" },
+      { label: "A snow globe", prompt: "" },
+    ],
   },
 ];

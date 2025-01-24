@@ -11,7 +11,6 @@ import logo from "@/public/logo.png";
 import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { useQuery } from "@tanstack/react-query";
-import { ExternalLink } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -19,6 +18,7 @@ import { z } from "zod";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
+  const [submittedPrompt, setSubmittedPrompt] = useState("");
   const [userAPIKey, setUserAPIKey] = useState("");
   const [selectedLoraModel, setSelectedLoraModel] = useState<Lora["model"]>();
 
@@ -38,7 +38,7 @@ export default function Home() {
 
   const { data, isFetching } = useQuery({
     placeholderData: (previousData) => previousData,
-    queryKey: [prompt, selectedLoraModel, userAPIKey],
+    queryKey: [submittedPrompt, selectedLoraModel, userAPIKey],
     queryFn: async () => {
       let res = await fetch("/api/generateImages", {
         method: "POST",
@@ -46,7 +46,7 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          prompt,
+          prompt: submittedPrompt,
           lora: selectedLoraModel,
           userAPIKey,
         }),
@@ -61,15 +61,10 @@ export default function Home() {
 
       return imageResponseSchema.parse(data);
     },
-    enabled: !!(prompt.trim() && selectedLoraModel),
+    enabled: !!(submittedPrompt.trim() && selectedLoraModel),
     staleTime: Infinity,
     retry: false,
   });
-
-  async function action(formData: FormData) {
-    let { prompt } = Object.fromEntries(formData.entries());
-    setPrompt(typeof prompt === "string" ? prompt : "");
-  }
 
   const selectedLora = LORAS.find((l) => l.model === selectedLoraModel);
 
@@ -105,7 +100,7 @@ export default function Home() {
       </header>
 
       <main className="mx-auto mt-10 w-full max-w-5xl grow">
-        <form className="w-full" action={action}>
+        <form className="w-full" action={() => setSubmittedPrompt(prompt)}>
           <fieldset className="flex w-full flex-col gap-8 md:flex-row">
             <div className="max-w-sm rounded-lg bg-gray-100 p-5">
               <p className="font-mono font-medium">Choose your LoRA</p>
@@ -163,28 +158,30 @@ export default function Home() {
                   spellCheck={false}
                   placeholder="Describe your image..."
                   required
-                  defaultValue={prompt}
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
                   className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-base text-gray-600 placeholder-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
                 />
 
-                <div className="mt-4">
-                  <p className="text-xs font-bold text-gray-400">Suggestions</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {[
-                      "New York City",
-                      "Elon Musk",
-                      "Morocco",
-                      "Italian cuisine",
-                    ].map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1.5 text-sm text-gray-600 hover:bg-gray-200"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
+                {selectedLora && (
+                  <div className="mt-4">
+                    <p className="text-xs font-bold text-gray-400">
+                      Suggestions
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {selectedLora.suggestions.map((suggestion, i) => (
+                        <button
+                          type="button"
+                          key={i}
+                          onClick={() => setPrompt(suggestion.prompt)}
+                          className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1.5 text-sm text-gray-600 hover:bg-gray-200"
+                        >
+                          {suggestion.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="mt-10">
                   <button
@@ -198,7 +195,7 @@ export default function Home() {
                 </div>
 
                 <div className="mt-20">
-                  {prompt && selectedLora ? (
+                  {submittedPrompt && selectedLora ? (
                     <AnimatePresence mode="wait">
                       {isFetching ? (
                         <motion.div
