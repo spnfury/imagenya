@@ -1,13 +1,19 @@
 import Providers from "@/app/providers";
 import type { Metadata } from "next";
 import PlausibleProvider from "next-plausible";
-import { Anonymous_Pro } from "next/font/google";
+import { DM_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const anonymousPro = Anonymous_Pro({
+const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-anonymous-pro",
+  weight: ["100", "200", "300", "400", "500", "600", "700"],
+  variable: "--font-ibm-plex-mono",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: "variable",
+  variable: "--font-dm-sans",
 });
 
 let title = "Loras – Generate AI Images with LoRAs";
@@ -46,11 +52,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full ${anonymousPro.variable} font-sans`}>
+    <html
+      lang="en"
+      className={`h-full ${ibmPlexMono.variable} ${dmSans.variable}`}
+    >
       <head>
         <PlausibleProvider domain="loras.dev" />
       </head>
-      <body className="h-full min-h-full bg-gray-100 font-sans text-gray-900 antialiased">
+      <body className="h-full min-h-full font-sans text-gray-900 antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

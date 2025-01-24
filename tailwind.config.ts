@@ -61,7 +61,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        mono: ["var(--font-anonymous-pro)", ...defaultTheme.fontFamily.mono],
+        sans: ["var(--font-dm-sans)", ...defaultTheme.fontFamily.sans],
+        mono: ["var(--font-ibm-plex-mono)", ...defaultTheme.fontFamily.mono],
       },
     },
   },
