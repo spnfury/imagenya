@@ -3,6 +3,7 @@
 import GithubIcon from "@/components/icons/github-icon";
 import PictureIcon from "@/components/icons/picture-icon";
 import XIcon from "@/components/icons/x-icon";
+import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
 import { Lora, LORAS } from "@/data/loras";
 import imagePlaceholder from "@/public/image-placeholder.png";
@@ -11,11 +12,10 @@ import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { useQuery } from "@tanstack/react-query";
 import { ExternalLink } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { AnimatePresence, motion } from "motion/react";
-import Spinner from "@/components/spinner";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -36,12 +36,42 @@ export default function Home() {
     setUserAPIKey(key);
   }, []);
 
-  const isSubmitting = false;
+  const { data, isFetching } = useQuery({
+    placeholderData: (previousData) => previousData,
+    queryKey: [prompt, selectedLoraModel, userAPIKey],
+    queryFn: async () => {
+      let res = await fetch("/api/generateImages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+          lora: selectedLoraModel,
+          userAPIKey,
+        }),
+      });
+
+      if (!res.ok) {
+        const message = await res.text();
+        throw new Error(message);
+      }
+
+      let data = await res.json();
+
+      return imageResponseSchema.parse(data);
+    },
+    enabled: !!(prompt.trim() && selectedLoraModel),
+    staleTime: Infinity,
+    retry: false,
+  });
 
   async function action(formData: FormData) {
     let { prompt } = Object.fromEntries(formData.entries());
     setPrompt(typeof prompt === "string" ? prompt : "");
   }
+
+  const selectedLora = LORAS.find((l) => l.model === selectedLoraModel);
 
   return (
     <div className="flex h-full flex-col px-5">
@@ -96,9 +126,8 @@ export default function Home() {
                       className="relative flex flex-col justify-start"
                       required
                     >
-                      {lora.model === selectedLoraModel && (
-                        <div className="absolute -inset-2 rounded-[6px] border-[1.5px] border-black bg-white" />
-                      )}
+                      <RadioGroup.Indicator className="absolute -inset-2 rounded-[6px] border-[1px] border-gray-400 bg-white shadow-sm" />
+
                       <div className="relative text-left">
                         <div className="relative">
                           <Image
@@ -114,8 +143,8 @@ export default function Home() {
                         <div className="flex items-center space-x-1.5">
                           <h3 className="text-gray-700">{lora.name}</h3>
                           <div>
-                            <a href={lora.url} target="_blank">
-                              <ExternalLink className="size-3.5" />
+                            <a href={lora.url} target="_blank" className="">
+                              <ArrowUpRightIcon className="size-3" />
                             </a>
                           </div>
                         </div>
@@ -159,8 +188,9 @@ export default function Home() {
 
                 <div className="mt-10">
                   <button
+                    disabled={isFetching}
                     type="submit"
-                    className="inline-flex w-full items-center justify-center gap-1 rounded border border-cyan-700 bg-cyan-600 px-4 py-2 text-gray-100 shadow hover:bg-cyan-600/90"
+                    className="inline-flex w-full items-center justify-center gap-1 rounded border border-cyan-700 bg-cyan-600 px-4 py-2 text-gray-100 shadow transition hover:bg-cyan-600/90 disabled:opacity-50"
                   >
                     <PictureIcon className="size-4" />
                     Generate Image
@@ -168,12 +198,47 @@ export default function Home() {
                 </div>
 
                 <div className="mt-20">
-                  {prompt && selectedLoraModel ? (
-                    <GeneratedImage
-                      prompt={prompt}
-                      loraModel={selectedLoraModel}
-                      userAPIKey={userAPIKey}
-                    />
+                  {prompt && selectedLora ? (
+                    <AnimatePresence mode="wait">
+                      {isFetching ? (
+                        <motion.div
+                          key="a"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          style={{
+                            aspectRatio:
+                              selectedLora?.width && selectedLora?.height
+                                ? selectedLora.width / selectedLora.height
+                                : 4 / 3,
+                          }}
+                          className="flex h-auto max-w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 shadow-sm"
+                        >
+                          <Spinner className="size-4" />
+                          Generating...
+                        </motion.div>
+                      ) : data ? (
+                        <motion.div
+                          key="b"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                        >
+                          <Image
+                            placeholder="blur"
+                            blurDataURL={imagePlaceholder.blurDataURL}
+                            width={selectedLora?.width ?? 1024}
+                            height={selectedLora?.height ?? 768}
+                            src={`data:image/png;base64,${data.image.b64_json}`}
+                            alt=""
+                            className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg border border-gray-200 object-cover shadow-sm`}
+                          />
+                          <p className="mt-2 text-center text-sm text-gray-500">
+                            {data.prompt}
+                          </p>
+                        </motion.div>
+                      ) : null}
+                    </AnimatePresence>
                   ) : (
                     <div className="flex aspect-[4/3] items-center justify-center">
                       <p className="text-balance px-4 text-center text-gray-500">
@@ -256,88 +321,3 @@ const imageResponseSchema = z.object({
     }),
   }),
 });
-
-type ImageResponse = z.infer<typeof imageResponseSchema>;
-
-function GeneratedImage({
-  prompt,
-  loraModel,
-  userAPIKey,
-}: {
-  prompt: string;
-  loraModel: string;
-  userAPIKey: string;
-}) {
-  let lora = LORAS.find((l) => l.model === loraModel);
-
-  const { data, isFetching } = useQuery({
-    placeholderData: (previousData) => previousData,
-    queryKey: [prompt, loraModel, userAPIKey],
-    queryFn: async () => {
-      let res = await fetch("/api/generateImages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt,
-          lora: loraModel,
-          userAPIKey,
-        }),
-      });
-
-      if (!res.ok) {
-        const message = await res.text();
-        throw new Error(message);
-      }
-
-      let data = await res.json();
-
-      return imageResponseSchema.parse(data);
-    },
-    enabled: !!(prompt.trim() && loraModel),
-    staleTime: Infinity,
-    retry: false,
-  });
-
-  return (
-    <AnimatePresence mode="wait">
-      {isFetching ? (
-        <motion.div
-          key="a"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          style={{
-            aspectRatio:
-              lora?.width && lora?.height ? lora.width / lora.height : 4 / 3,
-          }}
-          className="flex h-auto max-w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 shadow-sm"
-        >
-          <Spinner className="size-4" />
-          Generating...
-        </motion.div>
-      ) : data ? (
-        <motion.div
-          key="b"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <Image
-            placeholder="blur"
-            blurDataURL={imagePlaceholder.blurDataURL}
-            width={lora?.width ?? 1024}
-            height={lora?.height ?? 768}
-            src={`data:image/png;base64,${data.image.b64_json}`}
-            alt=""
-            className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg border border-gray-200 object-cover shadow-sm`}
-          />
-          <p className="mt-2 text-center text-sm text-gray-500">
-            {data.prompt}
-          </p>
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
-  );
-}
