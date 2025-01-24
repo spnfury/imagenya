@@ -10,11 +10,11 @@ const anonymousPro = Anonymous_Pro({
   variable: "--font-anonymous-pro",
 });
 
-let title = "BlinkShot – Real-Time AI Image Generator";
-let description = "Generate images with AI in a milliseconds";
-let url = "https://www.blinkshot.io/";
-let ogimage = "https://www.blinkshot.io/og-image.png";
-let sitename = "blinkshot.io";
+let title = "Loras – Generate AI Images with LoRAs";
+let description = "Generate AI Images with LoRAs in seconds.";
+let url = "https://www.loras.dev/";
+let ogimage = "https://www.loras.dev/og-image.png";
+let sitename = "loras.dev";
 
 export const metadata: Metadata = {
   metadataBase: new URL(url),

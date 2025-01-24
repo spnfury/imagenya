@@ -186,7 +186,7 @@ export default function Home() {
           <p className="hidden whitespace-nowrap md:block">
             100% free and{" "}
             <a
-              href="https://github.com/Nutlope/blinkshot"
+              href="https://github.com/Nutlope/loras-dev"
               target="_blank"
               className="underline underline-offset-4 transition hover:text-blue-500"
             >
@@ -195,7 +195,7 @@ export default function Home() {
           </p>
 
           <div className="flex gap-6 md:gap-2">
-            <a href="https://github.com/Nutlope/blinkshot" target="_blank">
+            <a href="https://github.com/Nutlope/loras-dev" target="_blank">
               <Button
                 variant="outline"
                 size="sm"
