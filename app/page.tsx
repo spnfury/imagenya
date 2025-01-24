@@ -18,23 +18,22 @@ import { z } from "zod";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
-  const [userAPIKey, setUserAPIKey] = useState(() => {
-    // Only run in browser
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("togetherApiKey") || "";
-    }
-    return "";
-  });
+  const [userAPIKey, setUserAPIKey] = useState("");
   const [selectedLoraModel, setSelectedLoraModel] = useState<Lora["model"]>();
 
-  // TODO fix
-  useEffect(() => {
-    if (userAPIKey) {
-      localStorage.setItem("togetherApiKey", userAPIKey);
+  function saveAPIKey(key: string) {
+    setUserAPIKey(key);
+    if (key) {
+      localStorage.setItem("togetherApiKey", key);
     } else {
       localStorage.removeItem("togetherApiKey");
     }
-  }, [userAPIKey]);
+  }
+
+  useEffect(() => {
+    const key = localStorage.getItem("togetherApiKey") ?? "";
+    setUserAPIKey(key);
+  }, []);
 
   const isSubmitting = false;
 
@@ -69,7 +68,7 @@ export default function Home() {
             placeholder="Enter your API key"
             value={userAPIKey}
             className="mt-1 rounded border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
-            onChange={(e) => setUserAPIKey(e.target.value)}
+            onChange={(e) => saveAPIKey(e.target.value)}
           />
         </div>
       </header>
@@ -155,7 +154,11 @@ export default function Home() {
 
       {prompt && selectedLoraModel && (
         <div className="">
-          <GeneratedImage prompt={prompt} loraModel={selectedLoraModel} />
+          <GeneratedImage
+            prompt={prompt}
+            loraModel={selectedLoraModel}
+            userAPIKey={userAPIKey}
+          />
         </div>
       )}
 
@@ -234,13 +237,17 @@ type ImageResponse = z.infer<typeof imageResponseSchema>;
 function GeneratedImage({
   prompt,
   loraModel,
+  userAPIKey,
 }: {
   prompt: string;
   loraModel: string;
+  userAPIKey: string;
 }) {
+  let lora = LORAS.find((l) => l.model === loraModel);
+
   const { data, isFetching } = useQuery({
     placeholderData: (previousData) => previousData,
-    queryKey: [prompt, loraModel],
+    queryKey: [prompt, loraModel, userAPIKey],
     queryFn: async () => {
       let res = await fetch("/api/generateImages", {
         method: "POST",
@@ -250,7 +257,7 @@ function GeneratedImage({
         body: JSON.stringify({
           prompt,
           lora: loraModel,
-          // userAPIKey,
+          userAPIKey,
         }),
       });
 
@@ -278,8 +285,8 @@ function GeneratedImage({
           <Image
             placeholder="blur"
             blurDataURL={imagePlaceholder.blurDataURL}
-            width={1024}
-            height={768}
+            width={lora?.width ?? 1024}
+            height={lora?.height ?? 768}
             src={`data:image/png;base64,${data.image.b64_json}`}
             alt=""
             className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg object-cover shadow-sm shadow-black`}

@@ -1,4 +1,4 @@
-import Together from "together-ai";
+import Together, { ClientOptions } from "together-ai";
 import { z } from "zod";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
@@ -28,27 +28,22 @@ export async function POST(req: Request) {
   let json = await req.json();
   let { prompt, userAPIKey, lora } = requestSchema.parse(json);
 
-  // Add observability if a Helicone key is specified, otherwise skip
-  // TODO
-  // let options: ConstructorParameters<typeof Together>[0] = {};
-  // if (process.env.HELICONE_API_KEY) {
-  //   options.baseURL = "https://together.helicone.ai/v1";
-  //   options.defaultHeaders = {
-  //     "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
-  //     "Helicone-Property-BYOK": userAPIKey ? "true" : "false",
-  //   };
-  // }
-
-  // if (userAPIKey) {
-  //   client.apiKey = userAPIKey;
-  // }
-
-  const options = {};
+  const options: ClientOptions = {
+    ...(userAPIKey ? { apiKey: userAPIKey } : {}),
+    ...(process.env.HELICONE_API_KEY
+      ? {
+          baseURL: "https://together.helicone.ai/v1",
+          defaultHeaders: {
+            "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
+            "Helicone-Property-BYOK": userAPIKey ? "true" : "false",
+          },
+        }
+      : {}),
+  };
   const client = new Together(options);
 
   if (ratelimit && !userAPIKey) {
     const identifier = await getIPAddress();
-
     const { success } = await ratelimit.limit(identifier);
     if (!success) {
       return Response.json(
