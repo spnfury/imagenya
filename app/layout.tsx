@@ -22,7 +22,7 @@ let url = "https://www.loras.dev/";
 let sitename = "loras.dev";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(url),
+  // metadataBase: new URL(url),
   title,
   description,
   openGraph: {
