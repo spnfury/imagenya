@@ -1,5 +1,5 @@
 import Providers from "@/app/providers";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import PlausibleProvider from "next-plausible";
 import { DM_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
@@ -38,6 +38,10 @@ export const metadata: Metadata = {
     title,
     description,
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0891b2",
 };
 
 export default function RootLayout({
