@@ -19,7 +19,6 @@ const dmSans = DM_Sans({
 let title = "Loras – Generate AI Images with LoRAs";
 let description = "Generate AI Images with LoRAs in seconds.";
 let url = "https://www.loras.dev/";
-let ogimage = "https://www.loras.dev/og-image.png";
 let sitename = "loras.dev";
 
 export const metadata: Metadata = {
@@ -30,7 +29,6 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
   },
   openGraph: {
-    images: [ogimage],
     title,
     description,
     url: url,
@@ -40,7 +38,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    images: [ogimage],
     title,
     description,
   },
