@@ -75,8 +75,8 @@ export default function Home() {
 
   return (
     <div className="flex h-full flex-col px-5">
-      <header className="flex justify-start pt-20 md:pt-3">
-        <div className="absolute left-1/2 top-6 -translate-x-1/2">
+      <header className="flex flex-col justify-start pt-3 md:flex-row">
+        <div className="max-md:flex max-md:flex-col max-md:items-center max-md:text-center md:absolute md:left-1/2 md:top-6 md:-translate-x-1/2">
           <a href="https://togetherai.link" target="_blank">
             <Image alt="" className="h-8 w-auto" src={logo} />
           </a>
@@ -84,7 +84,7 @@ export default function Home() {
             Generate AI Images with LoRAs
           </p>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col max-md:mt-4">
           <label className="text-sm">
             <a
               href="https://api.together.xyz/settings/api-keys"
@@ -106,7 +106,7 @@ export default function Home() {
 
       <main className="mx-auto mt-10 w-full max-w-5xl grow">
         <form className="w-full" action={action}>
-          <fieldset className="flex w-full gap-8">
+          <fieldset className="flex w-full flex-col gap-8 md:flex-row">
             <div className="max-w-sm rounded-lg bg-gray-100 p-5">
               <p className="font-mono font-medium">Choose your LoRA</p>
 
@@ -169,7 +169,7 @@ export default function Home() {
 
                 <div className="mt-4">
                   <p className="text-xs font-bold text-gray-400">Suggestions</p>
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     {[
                       "New York City",
                       "Elon Musk",
@@ -178,7 +178,7 @@ export default function Home() {
                     ].map((suggestion) => (
                       <button
                         key={suggestion}
-                        className="rounded-full bg-gray-100 px-2.5 py-1.5 text-sm text-gray-600 hover:bg-gray-200"
+                        className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1.5 text-sm text-gray-600 hover:bg-gray-200"
                       >
                         {suggestion}
                       </button>
