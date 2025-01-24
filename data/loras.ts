@@ -98,7 +98,12 @@ export const LORAS: Lora[] = [
       "Refine that prompt so it mimics MidJourney's style, blending intricate and artistic designs. Edit for photorealism and close-up shots.",
     scale: 1,
     steps: 28,
-    suggestions: [{ label: "A flaming red torch", prompt: "" }],
+    suggestions: [
+      {
+        label: "Banana bread",
+        prompt: "banana bread with choclate chips and pecans",
+      },
+    ],
   },
 
   {
@@ -116,9 +121,8 @@ export const LORAS: Lora[] = [
     scale: 1,
     steps: 28,
     suggestions: [
-      { label: "A flaming red torch", prompt: "" },
-      { label: "A brown briefcase", prompt: "" },
-      { label: "A snow globe", prompt: "" },
+      { label: "Leather jacket", prompt: "a leather jacket" },
+      { label: "Red dress", prompt: "a red dress" },
     ],
   },
   {
@@ -135,9 +139,9 @@ export const LORAS: Lora[] = [
     scale: 1,
     steps: 28,
     suggestions: [
-      { label: "A flaming red torch", prompt: "" },
-      { label: "A brown briefcase", prompt: "" },
-      { label: "A snow globe", prompt: "" },
+      { label: "Woman", prompt: "a woman" },
+      { label: "Bicycle", prompt: "a bicycle" },
+      { label: "San Francisco", prompt: "the San Francisco skyline" },
     ],
   },
   {
@@ -150,15 +154,13 @@ export const LORAS: Lora[] = [
     image: VectorSketch,
     path: "https://huggingface.co/mujibanget/vector-illustration",
     applyTrigger: (prompt) =>
-      `${prompt}, vector illustration with mujibvector style`,
-    refinement:
-      "Refine the prompt so that it describes a smooth, scalable vector-style sketch that is ideal for digital designs.",
+      `${prompt}, vector illustration with mujibvector style, isolated in a white background`,
+    refinement: false,
     scale: 1,
     steps: 28,
     suggestions: [
-      { label: "A flaming red torch", prompt: "" },
-      { label: "A brown briefcase", prompt: "" },
-      { label: "A snow globe", prompt: "" },
+      { label: "Dog", prompt: "cute dog" },
+      { label: "Flower", prompt: "a rose" },
     ],
   },
   {
@@ -174,9 +176,8 @@ export const LORAS: Lora[] = [
     scale: 1,
     steps: 28,
     suggestions: [
-      { label: "A flaming red torch", prompt: "" },
-      { label: "A brown briefcase", prompt: "" },
-      { label: "A snow globe", prompt: "" },
+      { label: "Cat", prompt: "a cat with blue eyes" },
+      { label: "Steve Jobs", prompt: "steve jobs" },
     ],
   },
   {
@@ -194,9 +195,9 @@ export const LORAS: Lora[] = [
     scale: 1,
     steps: 28,
     suggestions: [
-      { label: "A flaming red torch", prompt: "" },
-      { label: "A brown briefcase", prompt: "" },
-      { label: "A snow globe", prompt: "" },
+      { label: "Young man", prompt: "a young man with glasses" },
+      { label: "Paper cranes", prompt: "a flock of paper cranes" },
+      { label: "Flower", prompt: "a flower blooming" },
     ],
   },
   {
@@ -208,14 +209,13 @@ export const LORAS: Lora[] = [
     image: TarotCard,
     path: "https://huggingface.co/multimodalart/flux-tarot-v1",
     applyTrigger: (prompt) =>
-      `${prompt} in the style of TOK a trtcrd tarot style`,
+      `${prompt}, in the style of TOK a trtcrd tarot style`,
     refinement: false,
     scale: 1,
     steps: 28,
     suggestions: [
-      { label: "A flaming red torch", prompt: "" },
-      { label: "A brown briefcase", prompt: "" },
-      { label: "A snow globe", prompt: "" },
+      { label: "Coca-cola", prompt: "a coca cola can" },
+      { label: "Bakery", prompt: "a bakery" },
     ],
   },
 ];
