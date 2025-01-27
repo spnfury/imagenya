@@ -93,7 +93,7 @@ export default function Home() {
             Generate AI Images with LoRAs
           </p>
         </div>
-        <div className="flex flex-col max-md:mt-4">
+        <div className="flex w-full flex-col max-md:mt-4 md:max-w-xs">
           <label className="text-sm">
             <a
               href="https://api.together.xyz/settings/api-keys"
@@ -106,8 +106,9 @@ export default function Home() {
           </label>
           <input
             placeholder="Enter your API key"
+            type="password"
             value={userAPIKey}
-            className="mt-1 rounded border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
+            className="mt-1 rounded bg-gray-100 px-3 py-2 text-xs text-gray-700 placeholder-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
             onChange={(e) => saveAPIKey(e.target.value)}
           />
         </div>
