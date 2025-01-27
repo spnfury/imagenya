@@ -81,9 +81,7 @@ export async function POST(req: Request) {
       width: selectedLora.width ?? 1024,
       seed: 1234,
       steps: selectedLora.steps,
-      // guidance: 3.5,
       response_format: "base64",
-      // @ts-expect-error asdf
       image_loras: [
         {
           path: selectedLora.path,
