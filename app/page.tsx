@@ -5,6 +5,13 @@ import PictureIcon from "@/components/icons/picture-icon";
 import XIcon from "@/components/icons/x-icon";
 import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Lora, LORAS } from "@/data/loras";
 import imagePlaceholder from "@/public/image-placeholder.png";
 import logo from "@/public/logo.png";
@@ -40,7 +47,7 @@ export default function Home() {
     placeholderData: (previousData) => previousData,
     queryKey: [submittedPrompt, selectedLoraModel, userAPIKey],
     queryFn: async () => {
-      let res = await fetch("/api/generateImages", {
+      let res = await fetch("/api/image", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -230,9 +237,13 @@ export default function Home() {
                             alt=""
                             className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg border border-gray-200 object-cover shadow-sm`}
                           />
-                          <p className="mt-2 text-center text-sm text-gray-500">
-                            {data.prompt}
-                          </p>
+                          <div className="mt-2 text-center text-sm text-gray-500">
+                            {data.prompt}{" "}
+                            <ShowCodeButton
+                              prompt={data.prompt}
+                              lora={selectedLora}
+                            />
+                          </div>
                         </motion.div>
                       ) : null}
                     </AnimatePresence>
@@ -309,6 +320,75 @@ export default function Home() {
   );
 }
 
+function ShowCodeButton({ prompt, lora }: { prompt: string; lora: Lora }) {
+  const [isShowingDialog, setIsShowingDialog] = useState(false);
+
+  const { data, isFetching } = useQuery({
+    placeholderData: (previousData) => previousData,
+    queryKey: [prompt, lora.model],
+    queryFn: async () => {
+      let res = await fetch("/api/code", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+          lora: lora.model,
+        }),
+      });
+
+      if (!res.ok) {
+        const message = await res.text();
+        throw new Error(message);
+      }
+
+      let json = await res.json();
+
+      return codeResponseSchema.parse(json);
+    },
+    staleTime: Infinity,
+    enabled: isShowingDialog,
+    retry: false,
+  });
+
+  return (
+    <Dialog open={isShowingDialog} onOpenChange={setIsShowingDialog}>
+      <DialogTrigger className="text-cyan-600 underline">
+        Show code
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle>Code sample</DialogTitle>
+        <DialogDescription>Code used to generate this image</DialogDescription>
+        {isFetching ? (
+          <Spinner />
+        ) : data ? (
+          <div className="space-y-3 overflow-hidden">
+            <p>First, install the Together SDK:</p>
+
+            <div
+              dangerouslySetInnerHTML={{ __html: data.install }}
+              className="overflow-x-auto rounded bg-[#0d1117] p-4 font-mono text-sm"
+            />
+
+            <p>Next, use the code below to generate your image:</p>
+
+            <div
+              dangerouslySetInnerHTML={{ __html: data.example }}
+              className="overflow-x-auto rounded bg-[#0d1117] p-4 font-mono text-sm"
+            />
+
+            <p>
+              That's it! You should see the URL of your image printed on the
+              screen.
+            </p>
+          </div>
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 const imageResponseSchema = z.object({
   prompt: z.string(),
   image: z.object({
@@ -317,4 +397,9 @@ const imageResponseSchema = z.object({
       inference: z.number(),
     }),
   }),
+});
+
+const codeResponseSchema = z.object({
+  install: z.string(),
+  example: z.string(),
 });
