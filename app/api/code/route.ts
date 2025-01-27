@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       model: "black-forest-labs/FLUX.1-dev-lora",
       height: ${lora.height ?? 768},
       width: ${lora.width ?? 1024},
-      seed: 1234,
+      seed: ${json.seed},
       steps: ${lora.steps},
       image_loras: [
         {
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         model="black-forest-labs/FLUX.1-dev-lora",
         height=${lora.height ?? 768},
         width=${lora.width ?? 1024},
-        seed=1234,
+        seed=${json.seed},
         steps=${lora.steps},
         image_loras=[
             {

@@ -21,12 +21,13 @@ if (process.env.UPSTASH_REDIS_REST_URL) {
 let requestSchema = z.object({
   prompt: z.string(),
   lora: z.string(),
+  seed: z.number(),
   userAPIKey: z.string().optional(),
 });
 
 export async function POST(req: Request) {
   let json = await req.json();
-  let { prompt, userAPIKey, lora } = requestSchema.parse(json);
+  let { prompt, userAPIKey, lora, seed } = requestSchema.parse(json);
 
   const options: ClientOptions = {
     ...(userAPIKey ? { apiKey: userAPIKey } : {}),
@@ -79,7 +80,7 @@ export async function POST(req: Request) {
       model: "black-forest-labs/FLUX.1-dev-lora",
       height: selectedLora.height ?? 768,
       width: selectedLora.width ?? 1024,
-      seed: 1234,
+      seed,
       steps: selectedLora.steps,
       response_format: "base64",
       image_loras: [

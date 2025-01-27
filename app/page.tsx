@@ -32,6 +32,7 @@ export default function Home() {
   const [userAPIKey, setUserAPIKey] = useState("");
   const [selectedLoraModel, setSelectedLoraModel] = useState<Lora["model"]>();
   const [submittedLoraModel, setSubmittedLoraModel] = useState<Lora["model"]>();
+  const [submittedSeed, setSubmittedSeed] = useState<number>();
 
   function saveAPIKey(key: string) {
     setUserAPIKey(key);
@@ -49,7 +50,7 @@ export default function Home() {
 
   const { data, isFetching } = useQuery({
     placeholderData: (previousData) => previousData,
-    queryKey: [submittedPrompt, submittedLoraModel, userAPIKey],
+    queryKey: [submittedPrompt, submittedLoraModel, userAPIKey, submittedSeed],
     queryFn: async () => {
       let res = await fetch("/api/image", {
         method: "POST",
@@ -60,6 +61,7 @@ export default function Home() {
           prompt: submittedPrompt,
           lora: submittedLoraModel,
           userAPIKey,
+          seed: submittedSeed,
         }),
       });
 
@@ -117,6 +119,7 @@ export default function Home() {
           action={() => {
             setSubmittedPrompt(prompt);
             setSubmittedLoraModel(selectedLoraModel);
+            setSubmittedSeed(Math.floor(Math.random() * 9999999) + 1);
           }}
         >
           <fieldset className="flex w-full flex-col gap-8 md:flex-row">
@@ -213,7 +216,7 @@ export default function Home() {
                 </div>
 
                 <div className="mt-20">
-                  {submittedPrompt && submittedLora ? (
+                  {submittedPrompt && submittedLora && submittedSeed ? (
                     <AnimatePresence mode="wait">
                       {isFetching ? (
                         <motion.div
@@ -258,6 +261,7 @@ export default function Home() {
                                 submittedPrompt={submittedPrompt}
                                 prompt={data.prompt}
                                 lora={submittedLora}
+                                seed={submittedSeed}
                               />
                             </p>
                           </div>
@@ -341,17 +345,19 @@ function ShowCodeButton({
   submittedPrompt,
   prompt,
   lora,
+  seed,
 }: {
   submittedPrompt: string;
   prompt: string;
   lora: Lora;
+  seed: number;
 }) {
   const [isShowingDialog, setIsShowingDialog] = useState(false);
   const [language, setLanguage] = useState<"js" | "python">("js");
 
   const { data, isFetching } = useQuery({
     placeholderData: (previousData) => previousData,
-    queryKey: [prompt, lora.model],
+    queryKey: [prompt, lora.model, seed],
     queryFn: async () => {
       let res = await fetch("/api/code", {
         method: "POST",
@@ -361,6 +367,7 @@ function ShowCodeButton({
         body: JSON.stringify({
           prompt,
           lora: lora.model,
+          seed,
         }),
       });
 
