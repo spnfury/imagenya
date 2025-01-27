@@ -192,7 +192,16 @@ export default function Home() {
           </div>
 
           <div className="w-full">
-            <div className="ml-auto max-w-lg">
+            <div className="mx-auto max-w-lg">
+              <div className="mt-4 flex flex-col items-center">
+                <a href="https://togetherai.link" target="_blank">
+                  <Image alt="" className="h-8 w-auto" src={logo} />
+                </a>
+                <p className="font-mono text-gray-600">
+                  Generate AI Images with LoRAs
+                </p>
+              </div>
+
               <textarea
                 name="prompt"
                 rows={4}
