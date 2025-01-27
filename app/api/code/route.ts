@@ -109,5 +109,3 @@ async function generateCode(code: string, lang: string) {
 
   return html;
 }
-
-export const runtime = "edge";
