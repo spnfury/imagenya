@@ -1,7 +1,9 @@
 "use client";
 
 import GithubIcon from "@/components/icons/github-icon";
+import JavaScriptIcon from "@/components/icons/javascript-icon";
 import PictureIcon from "@/components/icons/picture-icon";
+import PythonIcon from "@/components/icons/python-icon";
 import XIcon from "@/components/icons/x-icon";
 import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
@@ -391,20 +393,22 @@ function ShowCodeButton({
         ) : data ? (
           <div className="overflow-hidden">
             <RadioGroup.Root
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-4 border-b"
               value={language}
               onValueChange={(value) => setLanguage(value as typeof language)}
             >
               <RadioGroup.Item
                 value="js"
-                className="decoration-gray-400 decoration-2 data-[state=checked]:underline"
+                className="inline-flex items-center gap-2 border-b border-transparent pb-1 text-sm data-[state=checked]:border-gray-700"
               >
+                <JavaScriptIcon />
                 JavaScript
               </RadioGroup.Item>
               <RadioGroup.Item
                 value="python"
-                className="decoration-gray-400 decoration-2 data-[state=checked]:underline"
+                className="inline-flex items-center gap-2 border-b border-transparent pb-1 text-sm data-[state=checked]:border-gray-700"
               >
+                <PythonIcon />
                 Python
               </RadioGroup.Item>
             </RadioGroup.Root>
