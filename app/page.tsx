@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs } from "@/components/ui/tabs";
 import { Lora, LORAS } from "@/data/loras";
 import imagePlaceholder from "@/public/image-placeholder.png";
 import logo from "@/public/logo.png";
@@ -240,6 +241,7 @@ export default function Home() {
                           <div className="mt-2 text-center text-sm text-gray-500">
                             {data.prompt}{" "}
                             <ShowCodeButton
+                              submittedPrompt={submittedPrompt}
                               prompt={data.prompt}
                               lora={selectedLora}
                             />
@@ -320,8 +322,17 @@ export default function Home() {
   );
 }
 
-function ShowCodeButton({ prompt, lora }: { prompt: string; lora: Lora }) {
+function ShowCodeButton({
+  submittedPrompt,
+  prompt,
+  lora,
+}: {
+  submittedPrompt: string;
+  prompt: string;
+  lora: Lora;
+}) {
   const [isShowingDialog, setIsShowingDialog] = useState(false);
+  const [language, setLanguage] = useState<"js" | "python">("js");
 
   const { data, isFetching } = useQuery({
     placeholderData: (previousData) => previousData,
@@ -359,29 +370,59 @@ function ShowCodeButton({ prompt, lora }: { prompt: string; lora: Lora }) {
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Code sample</DialogTitle>
-        <DialogDescription>Code used to generate this image</DialogDescription>
+        <DialogDescription>
+          Code used to generate "{submittedPrompt}"
+        </DialogDescription>
         {isFetching ? (
           <Spinner />
         ) : data ? (
-          <div className="space-y-3 overflow-hidden">
-            <p>First, install the Together SDK:</p>
+          <div className="overflow-hidden">
+            <RadioGroup.Root
+              className="flex items-center space-x-2"
+              value={language}
+              onValueChange={(value) => setLanguage(value as typeof language)}
+            >
+              <RadioGroup.Item
+                value="js"
+                className="decoration-gray-400 decoration-2 data-[state=checked]:underline"
+              >
+                JavaScript
+              </RadioGroup.Item>
+              <RadioGroup.Item
+                value="python"
+                className="decoration-gray-400 decoration-2 data-[state=checked]:underline"
+              >
+                Python
+              </RadioGroup.Item>
+            </RadioGroup.Root>
 
-            <div
-              dangerouslySetInnerHTML={{ __html: data.install }}
-              className="overflow-x-auto rounded bg-[#0d1117] p-4 font-mono text-sm"
-            />
+            <div className="mt-4 space-y-3">
+              <p>First, install the Together SDK:</p>
 
-            <p>Next, use the code below to generate your image:</p>
+              <div
+                dangerouslySetInnerHTML={{ __html: data[language].install }}
+                className="overflow-x-auto rounded bg-[#0d1117] p-4 font-mono text-sm"
+              />
 
-            <div
-              dangerouslySetInnerHTML={{ __html: data.example }}
-              className="overflow-x-auto rounded bg-[#0d1117] p-4 font-mono text-sm"
-            />
+              <p>Then set your API key</p>
 
-            <p>
-              That's it! You should see the URL of your image printed on the
-              screen.
-            </p>
+              <div
+                dangerouslySetInnerHTML={{ __html: data[language].apiKey }}
+                className="overflow-x-auto rounded bg-[#0d1117] p-4 font-mono text-sm"
+              />
+
+              <p>Now you can use the code below to generate your image:</p>
+
+              <div
+                dangerouslySetInnerHTML={{ __html: data[language].example }}
+                className="overflow-x-auto rounded bg-[#0d1117] p-4 font-mono text-sm"
+              />
+
+              <p>
+                That's it! You should see the URL of your image printed on the
+                screen.
+              </p>
+            </div>
           </div>
         ) : null}
       </DialogContent>
@@ -400,6 +441,14 @@ const imageResponseSchema = z.object({
 });
 
 const codeResponseSchema = z.object({
-  install: z.string(),
-  example: z.string(),
+  js: z.object({
+    install: z.string(),
+    apiKey: z.string(),
+    example: z.string(),
+  }),
+  python: z.object({
+    install: z.string(),
+    apiKey: z.string(),
+    example: z.string(),
+  }),
 });

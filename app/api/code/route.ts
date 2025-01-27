@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     const client = new Together();
     
-    const response = await client.images.create({
+    const image = await client.images.create({
       prompt: \"${json.prompt}\",
       model: "black-forest-labs/FLUX.1-dev-lora",
       height: ${lora.height ?? 768},
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       ],
     }); 
 
-    console.log("Image:", response.data[0]);
+    console.log("Image:", image.data[0].url);
   `;
 
   const pythonInstall = await text`pip install together-ai`;
@@ -41,34 +41,40 @@ export async function POST(request: Request) {
     def create_image():
         client = Together()
 
-        response = client.images.generate(
-            prompt="ep sketch, A vibrant, colorful, sketch illustration of a sleek, retro-style sports car with bold, expressive lines, bright, pop-art inspired colors, and dynamic, swirling patterns in the background.",
+        image = client.images.generate(
+            prompt="${json.prompt}",
             model="black-forest-labs/FLUX.1-dev-lora",
-            height=832,
-            width=1280,
+            height=${lora.height ?? 768},
+            width=${lora.width ?? 1024},
             seed=1234,
-            steps=33,
+            steps=${lora.steps},
             image_loras=[
                 {
-                    "path": "https://huggingface.co/strangerzonehf/Flux-Sketch-Ep-LoRA",
-                    "scale": 1,
+                    "path": "${lora.path}",
+                    "scale": ${lora.scale},
                 },
             ],
         )
 
-        print(response.data[0].url)
+        print(image.data[0].url)
 
     # Call the function
     create_image()
   `;
 
+  const setAPIKey = await shell`
+    export TOGETHER_API_KEY="your_api_key_here"
+  `;
+
   return Response.json({
     js: {
       install: jsInstall,
+      apiKey: setAPIKey,
       example: jsExample,
     },
     python: {
       install: pythonInstall,
+      apiKey: setAPIKey,
       example: pythonExample,
     },
   });
@@ -82,6 +88,11 @@ async function javascript(strings: TemplateStringsArray, ...values: any[]) {
 async function python(strings: TemplateStringsArray, ...values: any[]) {
   const string = extract(strings, ...values);
   return generateCode(string, "python");
+}
+
+async function shell(strings: TemplateStringsArray, ...values: any[]) {
+  const string = extract(strings, ...values);
+  return generateCode(string, "shell");
 }
 
 async function text(strings: TemplateStringsArray, ...values: any[]) {
