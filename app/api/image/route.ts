@@ -36,6 +36,7 @@ export async function POST(req: Request) {
           defaultHeaders: {
             "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
             "Helicone-Property-BYOK": userAPIKey ? "true" : "false",
+            "Helicone-Property-appname": "LorasDev",
           },
         }
       : {}),
