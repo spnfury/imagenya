@@ -29,6 +29,7 @@ export default function Home() {
   const [submittedPrompt, setSubmittedPrompt] = useState("");
   const [userAPIKey, setUserAPIKey] = useState("");
   const [selectedLoraModel, setSelectedLoraModel] = useState<Lora["model"]>();
+  const [submittedLoraModel, setSubmittedLoraModel] = useState<Lora["model"]>();
 
   function saveAPIKey(key: string) {
     setUserAPIKey(key);
@@ -46,7 +47,7 @@ export default function Home() {
 
   const { data, isFetching } = useQuery({
     placeholderData: (previousData) => previousData,
-    queryKey: [submittedPrompt, selectedLoraModel, userAPIKey],
+    queryKey: [submittedPrompt, submittedLoraModel, userAPIKey],
     queryFn: async () => {
       let res = await fetch("/api/image", {
         method: "POST",
@@ -55,7 +56,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           prompt: submittedPrompt,
-          lora: selectedLoraModel,
+          lora: submittedLoraModel,
           userAPIKey,
         }),
       });
@@ -69,12 +70,13 @@ export default function Home() {
 
       return imageResponseSchema.parse(data);
     },
-    enabled: !!(submittedPrompt.trim() && selectedLoraModel),
+    enabled: !!(submittedPrompt.trim() && submittedLoraModel),
     staleTime: Infinity,
     retry: false,
   });
 
   const selectedLora = LORAS.find((l) => l.model === selectedLoraModel);
+  const submittedLora = LORAS.find((l) => l.model === submittedLoraModel);
 
   return (
     <div className="flex h-full flex-col px-5">
@@ -108,7 +110,13 @@ export default function Home() {
       </header>
 
       <main className="mx-auto mt-10 w-full max-w-5xl grow">
-        <form className="w-full" action={() => setSubmittedPrompt(prompt)}>
+        <form
+          className="w-full"
+          action={() => {
+            setSubmittedPrompt(prompt);
+            setSubmittedLoraModel(selectedLoraModel);
+          }}
+        >
           <fieldset className="flex w-full flex-col gap-8 md:flex-row">
             <div className="max-w-sm rounded-lg bg-gray-100 p-5">
               <p className="font-mono font-medium">Choose your LoRA</p>
@@ -203,7 +211,7 @@ export default function Home() {
                 </div>
 
                 <div className="mt-20">
-                  {submittedPrompt && selectedLora ? (
+                  {submittedPrompt && submittedLora ? (
                     <AnimatePresence mode="wait">
                       {isFetching ? (
                         <motion.div
@@ -213,8 +221,8 @@ export default function Home() {
                           exit={{ opacity: 0 }}
                           style={{
                             aspectRatio:
-                              selectedLora?.width && selectedLora?.height
-                                ? selectedLora.width / selectedLora.height
+                              submittedLora?.width && submittedLora?.height
+                                ? submittedLora.width / submittedLora.height
                                 : 4 / 3,
                           }}
                           className="flex h-auto max-w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 shadow-sm"
@@ -232,19 +240,24 @@ export default function Home() {
                           <Image
                             placeholder="blur"
                             blurDataURL={imagePlaceholder.blurDataURL}
-                            width={selectedLora?.width ?? 1024}
-                            height={selectedLora?.height ?? 768}
+                            width={submittedLora?.width ?? 1024}
+                            height={submittedLora?.height ?? 768}
                             src={`data:image/png;base64,${data.image.b64_json}`}
                             alt=""
                             className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg border border-gray-200 object-cover shadow-sm`}
                           />
-                          <div className="mt-2 text-center text-sm text-gray-500">
-                            {data.prompt}{" "}
-                            <ShowCodeButton
-                              submittedPrompt={submittedPrompt}
-                              prompt={data.prompt}
-                              lora={selectedLora}
-                            />
+                          <div className="mt-2 text-center text-sm">
+                            <p className="text-gray-700">
+                              {submittedLora.name}
+                            </p>
+                            <p className="mt-1 text-gray-400">
+                              {data.prompt}{" "}
+                              <ShowCodeButton
+                                submittedPrompt={submittedPrompt}
+                                prompt={data.prompt}
+                                lora={submittedLora}
+                              />
+                            </p>
                           </div>
                         </motion.div>
                       ) : null}
