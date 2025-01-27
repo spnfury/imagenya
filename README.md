@@ -1,5 +1,5 @@
 <a href="https://www.loras.dev">
-  <img alt="Loras" src="./public/og-image.png">
+  <img alt="Loras" src="./app/opengraph-image.png">
   <h1 align="center">Loras</h1>
 </a>
 
