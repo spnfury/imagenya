@@ -143,7 +143,7 @@ export default function Home() {
                       className="relative flex flex-col justify-start"
                       required
                     >
-                      <RadioGroup.Indicator className="absolute -inset-2 rounded-[6px] border-[1px] border-gray-400 bg-white shadow-sm" />
+                      <RadioGroup.Indicator className="absolute -inset-2 rounded-[6px] border-[1.5px] border-gray-900 bg-white shadow-sm" />
 
                       <div className="relative text-left">
                         <div className="relative">
