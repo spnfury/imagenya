@@ -1,4 +1,4 @@
-import { codeToHtml } from "shiki/bundle/web";
+import { codeToHtml } from "shiki";
 import dedent from "dedent";
 import { LORAS } from "@/data/loras";
 
