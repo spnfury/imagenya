@@ -2,7 +2,7 @@ import Together from "together-ai";
 
 const client = new Together();
 
-const response = await client.images.create({
+const image = await client.images.create({
   prompt:
     "ep sketch, A vibrant, colorful, sketch illustration of a sleek, retro-style sports car with bold, expressive lines, bright, pop-art inspired colors, and dynamic, swirling patterns in the background.",
   model: "black-forest-labs/FLUX.1-dev-lora",
@@ -18,4 +18,4 @@ const response = await client.images.create({
   ],
 });
 
-console.log(response.data[0].url);
+console.log(image.data[0].url);

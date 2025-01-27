@@ -31,35 +31,29 @@ export async function POST(request: Request) {
       ],
     }); 
 
-    console.log("Image:", image.data[0].url);
+    console.log(image.data[0].url);
   `;
 
   const pythonInstall = await text`pip install together-ai`;
   const pythonExample = await python`
     from together import Together
 
-    def create_image():
-        client = Together()
+    image = client.images.generate(
+        prompt="${json.prompt}",
+        model="black-forest-labs/FLUX.1-dev-lora",
+        height=${lora.height ?? 768},
+        width=${lora.width ?? 1024},
+        seed=1234,
+        steps=${lora.steps},
+        image_loras=[
+            {
+                "path": "${lora.path}",
+                "scale": ${lora.scale},
+            },
+        ],
+    )
 
-        image = client.images.generate(
-            prompt="${json.prompt}",
-            model="black-forest-labs/FLUX.1-dev-lora",
-            height=${lora.height ?? 768},
-            width=${lora.width ?? 1024},
-            seed=1234,
-            steps=${lora.steps},
-            image_loras=[
-                {
-                    "path": "${lora.path}",
-                    "scale": ${lora.scale},
-                },
-            ],
-        )
-
-        print(image.data[0].url)
-
-    # Call the function
-    create_image()
+    print(image.data[0].url)
   `;
 
   const setAPIKey = await shell`
