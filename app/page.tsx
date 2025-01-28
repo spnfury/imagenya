@@ -1,12 +1,9 @@
 "use client";
 
-import GithubIcon from "@/components/icons/github-icon";
 import JavaScriptIcon from "@/components/icons/javascript-icon";
 import PictureIcon from "@/components/icons/picture-icon";
 import PythonIcon from "@/components/icons/python-icon";
-import XIcon from "@/components/icons/x-icon";
 import Spinner from "@/components/spinner";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,11 +11,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Tabs } from "@/components/ui/tabs";
 import { Lora, LORAS } from "@/data/loras";
 import imagePlaceholder from "@/public/image-placeholder.png";
 import logo from "@/public/logo.png";
 import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
+import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
@@ -116,106 +113,107 @@ export default function Home() {
             </div>
 
             <div className="p-5">
-              <div>
-                <p className="font-mono font-medium tracking-tight">
-                  Describe your image
-                </p>
-                <div className="relative mt-2">
-                  <textarea
-                    name="prompt"
-                    rows={6}
-                    spellCheck={false}
-                    placeholder="New York City..."
-                    required
-                    autoComplete="off"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="block w-full resize-none rounded-md border border-gray-300 bg-white px-4 py-3 text-sm text-gray-600 placeholder-gray-400 hover:border-gray-400/70 focus:outline focus:outline-2 focus:-outline-offset-1 focus:outline-blue-500"
-                  />
-
-                  {selectedLora && (
-                    <div className="absolute inset-x-2 bottom-2 flex items-center">
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {selectedLora.suggestions.map((suggestion, i) => (
-                          <button
-                            type="button"
-                            key={i}
-                            onClick={() => setPrompt(suggestion.prompt)}
-                            className="shrink-0 rounded-full bg-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
-                          >
-                            {suggestion.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <p className="mt-6 font-mono font-medium tracking-tight">
-                  Select a LoRA
-                </p>
-                <RadioGroup.Root
-                  name="lora"
-                  value={selectedLoraModel}
-                  onValueChange={setSelectedLoraModel}
-                  className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3"
-                >
-                  {LORAS.map((lora) => (
-                    <div
-                      className="relative [&_input]:inset-0 [&_input]:!translate-x-0"
-                      key={lora.id}
-                    >
-                      <RadioGroup.Item
-                        value={lora.model}
-                        className="relative flex flex-col justify-start"
-                        required
-                      >
-                        <RadioGroup.Indicator className="absolute -inset-2 rounded-[6px] border-[1.5px] border-gray-900 bg-white shadow-sm" />
-                        <div className="relative text-left">
-                          <div className="relative">
-                            <Image
-                              className="aspect-[37/24] rounded-[4px] object-cover object-center"
-                              src={lora.image}
-                              alt={lora.name}
-                            />
-                            <div className="absolute inset-0 rounded-[4px] ring-1 ring-inset ring-black/10" />
-                            <div className="absolute bottom-1 right-1 rounded-sm bg-white/60 px-1.5 pb-1 pt-0.5 leading-[13px] backdrop-blur-[1px]">
-                              <span className="text-xs font-medium leading-none text-gray-900">
-                                {lora.name}
-                              </span>
-                            </div>
-                          </div>
-                          {/* <div className="mt-1 line-clamp-1 text-sm font-light text-gray-400">
-                            {lora.model}
-                          </div> */}
-                          {/* <div className="flex items-center space-x-1.5">
-                            <h3 className="text-gray-700">{lora.name}</h3>
-                            <div>
-                              <a href={lora.url} target="_blank" className="">
-                                <ArrowUpRightIcon className="size-3" />
-                              </a>
-                            </div>
-                          </div> */}
-                        </div>
-                      </RadioGroup.Item>
-                    </div>
-                  ))}
-                </RadioGroup.Root>
-              </div>
-
-              <div className="mt-4">
-                <div className="mt-10">
-                  <button
-                    disabled={isFetching}
-                    type="submit"
-                    className="inline-flex w-full items-center justify-center gap-1 rounded border border-cyan-700 bg-cyan-600 px-4 py-2 text-gray-100 shadow transition hover:bg-cyan-600/90 disabled:opacity-50"
+              <div className="flex flex-col gap-8">
+                <div>
+                  <p className="font-mono font-medium tracking-tight">
+                    Select a LoRA
+                  </p>
+                  <RadioGroup.Root
+                    name="lora"
+                    value={selectedLoraModel}
+                    onValueChange={setSelectedLoraModel}
+                    className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3"
                   >
-                    <PictureIcon className="size-4" />
-                    Generate Image
-                  </button>
+                    {LORAS.map((lora) => (
+                      <div
+                        className="relative [&_input]:inset-0 [&_input]:!translate-x-0"
+                        key={lora.id}
+                      >
+                        <RadioGroup.Item
+                          value={lora.model}
+                          className="group relative flex flex-col justify-start rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+                          required
+                        >
+                          <div className="relative">
+                            <div className="relative">
+                              <Image
+                                className="aspect-[37/24] rounded object-cover object-center"
+                                src={lora.image}
+                                alt={lora.name}
+                              />
+                              <div className="absolute inset-0 rounded-[4px] ring-1 ring-inset ring-black/10 group-hover:ring-black/20" />
+                              <div className="absolute bottom-1.5 right-1.5 rounded-sm bg-white/60 px-1.5 pb-1 pt-0.5 leading-[13px] shadow-sm backdrop-blur-[2px]">
+                                <span className="text-xs font-medium leading-none text-gray-900">
+                                  {lora.name}
+                                </span>
+                              </div>
+                            </div>
+                            {/* <div className="mt-1 line-clamp-1 text-sm font-light text-gray-400">
+                              {lora.model}
+                            </div> */}
+                            {/* <div className="flex items-center space-x-1.5">
+                              <h3 className="text-gray-700">{lora.name}</h3>
+                              <div>
+                                <a href={lora.url} target="_blank" className="">
+                                  <ArrowUpRightIcon className="size-3" />
+                                </a>
+                              </div>
+                            </div> */}
+                          </div>
+                          <RadioGroup.Indicator className="absolute right-2 top-2">
+                            <CheckCircleIcon className="size-6 rounded-full bg-white text-black" />
+                          </RadioGroup.Indicator>
+                        </RadioGroup.Item>
+                      </div>
+                    ))}
+                  </RadioGroup.Root>
                 </div>
+
+                <div>
+                  <p className="font-mono font-medium tracking-tight">
+                    Describe your image
+                  </p>
+                  <div className="relative mt-2">
+                    <textarea
+                      name="prompt"
+                      rows={6}
+                      spellCheck={false}
+                      placeholder="New York City..."
+                      required
+                      autoComplete="off"
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      className="block w-full resize-none rounded-md border border-gray-300 bg-white px-4 py-3 text-sm text-gray-600 placeholder-gray-400 hover:border-gray-400/70 focus:outline focus:outline-2 focus:-outline-offset-1 focus:outline-blue-500"
+                    />
+                    {selectedLora && (
+                      <div className="absolute inset-x-2 bottom-2 flex items-center">
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {selectedLora.suggestions.map((suggestion, i) => (
+                            <button
+                              type="button"
+                              key={i}
+                              onClick={() => setPrompt(suggestion.prompt)}
+                              className="shrink-0 rounded-full bg-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
+                            >
+                              {suggestion.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-12">
+                <button
+                  disabled={isFetching}
+                  type="submit"
+                  className="inline-flex w-full items-center justify-center gap-1 rounded-md bg-cyan-600 px-4 py-2 font-medium text-gray-100 shadow hover:bg-cyan-600/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 disabled:opacity-50"
+                >
+                  <PictureIcon className="size-4" />
+                  Generate Image
+                </button>
               </div>
             </div>
           </div>
