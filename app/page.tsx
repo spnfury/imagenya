@@ -230,49 +230,6 @@ export default function Home() {
               </div>
 
               <div className="flex grow flex-col justify-center">
-                {/* <div>
-                  <textarea
-                    name="prompt"
-                    rows={4}
-                    spellCheck={false}
-                    placeholder="Describe your image..."
-                    required
-                    autoComplete="off"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-base text-gray-600 placeholder-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
-                  />
-                  
-                  {selectedLora && (
-                    <div className="mt-4">
-                      <p className="text-xs font-bold text-gray-400">
-                        Suggestions
-                      </p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {selectedLora.suggestions.map((suggestion, i) => (
-                          <button
-                            type="button"
-                            key={i}
-                            onClick={() => setPrompt(suggestion.prompt)}
-                            className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1.5 text-sm text-gray-600 hover:bg-gray-200"
-                          >
-                            {suggestion.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div> */}
-                {/* <div className="mt-10">
-                  <button
-                    disabled={isFetching}
-                    type="submit"
-                    className="inline-flex w-full items-center justify-center gap-1 rounded border border-cyan-700 bg-cyan-600 px-4 py-2 text-gray-100 shadow transition hover:bg-cyan-600/90 disabled:opacity-50"
-                  >
-                    <PictureIcon className="size-4" />
-                    Generate Image
-                  </button>
-                </div> */}
                 <div>
                   {submittedPrompt && submittedLora && submittedSeed ? (
                     <AnimatePresence mode="wait">
