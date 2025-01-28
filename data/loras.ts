@@ -57,12 +57,19 @@ export const LORAS: Lora[] = [
     url: "https://huggingface.co/Shakker-Labs/FLUX.1-dev-LoRA-Logo-Design",
     image: LogoDesign,
     path: "https://huggingface.co/Shakker-Labs/FLUX.1-dev-LoRA-Logo-Design",
-    applyTrigger: (prompt) => `wablogo, logo, Minimalist, ${prompt}`,
+    applyTrigger: (prompt) => `logo, Minimalist, ${prompt}`,
     refinement:
       "Refine the prompt so that it describes a professional and minimalist logo. If the prompt describes two items, then just return those two items.",
     scale: 0.8,
     steps: 28,
-    suggestions: [{ label: "Cat and flame", prompt: "cat and flame" }],
+    suggestions: [
+      { label: "Cat and flame", prompt: "cat and flame" },
+      {
+        label: "Coffee and city",
+        prompt: "a cup of coffee and a city skyline",
+      },
+      { label: "Tree and water", prompt: "A tree and a lake" },
+    ],
   },
   {
     id: 1,
@@ -82,6 +89,7 @@ export const LORAS: Lora[] = [
     suggestions: [
       { label: "Albert Einstein", prompt: "Albert Einstein" },
       { label: "New York City", prompt: "New York City" },
+      { label: "Space adventure", prompt: "Space adventure" },
     ],
   },
   {
@@ -101,7 +109,15 @@ export const LORAS: Lora[] = [
     suggestions: [
       {
         label: "Banana bread",
-        prompt: "banana bread with choclate chips and pecans",
+        prompt: "banana bread with chocolate chips and pecans",
+      },
+      {
+        label: "Gemstone",
+        prompt: "A gemstone under soft lighting",
+      },
+      {
+        label: "Paint palette",
+        prompt: "An artist's paint palette smeared with vibrant colors",
       },
     ],
   },
@@ -123,6 +139,7 @@ export const LORAS: Lora[] = [
     suggestions: [
       { label: "Leather jacket", prompt: "a leather jacket" },
       { label: "Red dress", prompt: "a red dress" },
+      { label: "Scarf", prompt: "a silk scarf" },
     ],
   },
   {
@@ -161,6 +178,7 @@ export const LORAS: Lora[] = [
     suggestions: [
       { label: "Dog", prompt: "cute dog" },
       { label: "Flower", prompt: "a rose" },
+      { label: "Lamp", prompt: "a vintage lamp" },
     ],
   },
   {
@@ -178,6 +196,7 @@ export const LORAS: Lora[] = [
     suggestions: [
       { label: "Cat", prompt: "a cat with blue eyes" },
       { label: "Steve Jobs", prompt: "steve jobs" },
+      { label: "Books", prompt: "A stack of books" },
     ],
   },
   {
@@ -214,8 +233,9 @@ export const LORAS: Lora[] = [
     scale: 1,
     steps: 28,
     suggestions: [
-      { label: "Coca-cola", prompt: "a coca cola can" },
-      { label: "Bakery", prompt: "a bakery" },
+      { label: "Wheel of fortune", prompt: "the wheel of fortune" },
+      { label: "Kangaroo", prompt: "a kangaroo" },
+      { label: "Moon", prompt: "the moon" },
     ],
   },
 ];
