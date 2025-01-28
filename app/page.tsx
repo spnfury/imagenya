@@ -101,26 +101,6 @@ export default function Home() {
             <div className="mt-4 md:hidden">
               <Header />
             </div>
-            <div className="mt-4 flex w-full flex-col border-t border-gray-300 p-5 md:mt-0 md:border-b md:border-t-0">
-              <label className="text-xs font-medium">
-                <a
-                  href="https://api.together.xyz/settings/api-keys"
-                  target="_blank"
-                  className="inline-flex items-center gap-0.5 font-mono tracking-tight transition hover:text-blue-500"
-                >
-                  Together AI API Key
-                  <ArrowUpRightIcon className="size-3" />
-                </a>{" "}
-              </label>
-              <input
-                placeholder="Enter your API key"
-                type="password"
-                autoComplete="new-password"
-                value={userAPIKey}
-                className="mt-2 rounded-md border border-gray-300 bg-gray-200 px-3 py-2 text-xs text-gray-700 placeholder-gray-400 hover:border-gray-400/70 focus:outline focus:outline-2 focus:-outline-offset-1 focus:outline-blue-500"
-                onChange={(e) => saveAPIKey(e.target.value)}
-              />
-            </div>
             <div className="p-5">
               <div className="flex flex-col gap-8">
                 <div>
@@ -157,17 +137,6 @@ export default function Home() {
                                 </span>
                               </div>
                             </div>
-                            {/* <div className="mt-1 line-clamp-1 text-sm font-light text-gray-400">
-                              {lora.model}
-                            </div> */}
-                            {/* <div className="flex items-center space-x-1.5">
-                              <h3 className="text-gray-700">{lora.name}</h3>
-                              <div>
-                                <a href={lora.url} target="_blank" className="">
-                                  <ArrowUpRightIcon className="size-3" />
-                                </a>
-                              </div>
-                            </div> */}
                           </div>
                           <div className="invisible absolute left-2 top-2 group-hover:visible">
                             <a href={lora.url} target="_blank" className="">
@@ -217,6 +186,28 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
+              <div className="mt-8 flex w-full flex-col">
+                <label className="text-xs font-medium">
+                  <a
+                    href="https://api.together.xyz/settings/api-keys"
+                    target="_blank"
+                    className="inline-flex items-center gap-0.5 font-mono tracking-tight transition hover:text-blue-500"
+                  >
+                    [Optional] Together AI API Key
+                    <ArrowUpRightIcon className="size-3" />
+                  </a>{" "}
+                </label>
+                <input
+                  placeholder="Enter your API key"
+                  type="password"
+                  autoComplete="new-password"
+                  value={userAPIKey}
+                  className="mt-2 rounded-md border border-gray-300 bg-gray-200 px-3 py-2 text-xs text-gray-700 placeholder-gray-400 hover:border-gray-400/70 focus:outline focus:outline-2 focus:-outline-offset-1 focus:outline-blue-500"
+                  onChange={(e) => saveAPIKey(e.target.value)}
+                />
+              </div>
+
               <div className="mt-12">
                 <button
                   disabled={isFetching}
@@ -230,7 +221,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex min-h-dvh w-full flex-col px-4">
+          <div className="flex w-full flex-col px-4 md:min-h-dvh">
             <div className="mx-auto flex h-full max-w-lg grow flex-col">
               <div className="mt-4 hidden md:block">
                 <Header />
@@ -265,7 +256,24 @@ export default function Home() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                           >
-                            <div className="relative">
+                            <div className="flex items-center justify-end gap-2">
+                              <ShowCodeButton
+                                submittedPrompt={submittedPrompt}
+                                prompt={data.prompt}
+                                lora={submittedLora}
+                                seed={submittedSeed}
+                              />
+                              <a
+                                href={`data:image/png;base64,${data.image.b64_json}`}
+                                title="Download this image"
+                                download="image.jpg"
+                                className="inline-flex items-center gap-1 rounded-md bg-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-500 opacity-75 transition hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+                              >
+                                <ArrowDownIcon className="size-4" />
+                                Download
+                              </a>
+                            </div>
+                            <div className="relative mt-2">
                               <Image
                                 placeholder="blur"
                                 blurDataURL={imagePlaceholder.blurDataURL}
@@ -275,23 +283,6 @@ export default function Home() {
                                 alt=""
                                 className={`${isFetching ? "animate-pulse" : ""} max-w-full border border-gray-200 object-cover`}
                               />
-
-                              <div className="absolute inset-x-2 bottom-2 flex items-center justify-end gap-2">
-                                <ShowCodeButton
-                                  submittedPrompt={submittedPrompt}
-                                  prompt={data.prompt}
-                                  lora={submittedLora}
-                                  seed={submittedSeed}
-                                />
-                                <a
-                                  href={`data:image/png;base64,${data.image.b64_json}`}
-                                  title="Download this image"
-                                  download="image.jpg"
-                                  className="rounded-md bg-white px-2.5 py-1.5 text-xs font-medium text-gray-500 opacity-75 shadow-sm shadow-gray-500/20 transition hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
-                                >
-                                  <ArrowDownIcon className="size-4" />
-                                </a>
-                              </div>
                             </div>
 
                             <div className="mt-2 text-center text-sm">
@@ -425,10 +416,11 @@ function ShowCodeButton({
   return (
     <Dialog open={isShowingDialog} onOpenChange={setIsShowingDialog}>
       <DialogTrigger
-        className="rounded-md bg-white px-2.5 py-1.5 text-xs font-medium text-gray-500 opacity-75 shadow-sm shadow-gray-500/20 transition hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+        className="inline-flex items-center gap-1 rounded-md bg-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-500 opacity-75 transition hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
         title="View code sample"
       >
         <CodeBracketIcon className="size-4" />
+        Code
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Code sample</DialogTitle>
