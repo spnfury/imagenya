@@ -110,7 +110,7 @@ export default function Home() {
                 type="password"
                 autoComplete="new-password"
                 value={userAPIKey}
-                className="mt-2 rounded bg-gray-200 px-3 py-2 text-xs text-gray-700 placeholder-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
+                className="mt-2 rounded-md border border-gray-300 bg-gray-200 px-3 py-2 text-xs text-gray-700 placeholder-gray-400 hover:border-gray-400/70 focus:outline focus:outline-2 focus:-outline-offset-1 focus:outline-blue-500"
                 onChange={(e) => saveAPIKey(e.target.value)}
               />
             </div>
@@ -120,29 +120,28 @@ export default function Home() {
                 <p className="font-mono font-medium tracking-tight">
                   Describe your image
                 </p>
-                <div className="mt-2">
+                <div className="relative mt-2">
                   <textarea
                     name="prompt"
-                    rows={4}
+                    rows={6}
                     spellCheck={false}
                     placeholder="New York City..."
                     required
                     autoComplete="off"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    className="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-600 placeholder-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300"
+                    className="block w-full resize-none rounded-md border border-gray-300 bg-white px-4 py-3 text-sm text-gray-600 placeholder-gray-400 hover:border-gray-400/70 focus:outline focus:outline-2 focus:-outline-offset-1 focus:outline-blue-500"
                   />
 
                   {selectedLora && (
-                    <div className="mt-2">
-                      <p className="text-xs text-gray-500">Suggestions:</p>
+                    <div className="absolute inset-x-2 bottom-2 flex items-center">
                       <div className="mt-2 flex flex-wrap gap-2">
                         {selectedLora.suggestions.map((suggestion, i) => (
                           <button
                             type="button"
                             key={i}
                             onClick={() => setPrompt(suggestion.prompt)}
-                            className="shrink-0 rounded-full bg-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-200"
+                            className="shrink-0 rounded-full bg-gray-200 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500"
                           >
                             {suggestion.label}
                           </button>

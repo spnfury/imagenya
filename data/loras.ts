@@ -44,7 +44,7 @@ export const LORAS: Lora[] = [
     height: 832,
     width: 1280,
     suggestions: [
-      { label: "Flaming red torch", prompt: "A flaming red torch" },
+      { label: "Red torch", prompt: "A flaming red torch" },
       { label: "Brown briefcase", prompt: "A brown briefcase" },
       { label: "Snow globe", prompt: "A snow globe" },
     ],
@@ -89,7 +89,7 @@ export const LORAS: Lora[] = [
     suggestions: [
       { label: "Albert Einstein", prompt: "Albert Einstein" },
       { label: "New York City", prompt: "New York City" },
-      { label: "Space adventure", prompt: "Space adventure" },
+      { label: "Space", prompt: "Space adventure" },
     ],
   },
   {
