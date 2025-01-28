@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     console.log(image.data[0].url);
   `;
 
-  const pythonInstall = await text`pip install together-ai`;
+  const pythonInstall = await text`pip install together`;
   const pythonExample = await python`
     from together import Together
 
