@@ -119,46 +119,46 @@ export const LORAS: Lora[] = [
       { label: "Moon", prompt: "the moon" },
     ],
   },
-  {
-    id: 8,
-    name: "Outfit Generator",
-    model: "FLUX.1-dev-LoRA-Outfit-Generator",
-    url: "https://huggingface.co/tryonlabs/FLUX.1-dev-LoRA-Outfit-Generator",
-    description:
-      "Generates creative outfit designs for concept art and fashion.",
-    image: OutfitGenerator,
-    path: "https://huggingface.co/tryonlabs/FLUX.1-dev-LoRA-Outfit-Generator",
-    applyTrigger: (prompt) => prompt,
-    refinement:
-      "Change the prompt does that it describes a piece of clothing. You need to include each of the following details: color, pattern, fit, style, material, and type.",
-    scale: 1,
-    steps: 28,
-    suggestions: [
-      { label: "Leather jacket", prompt: "a leather jacket" },
-      { label: "Red dress", prompt: "a red dress" },
-      { label: "Scarf", prompt: "a silk scarf" },
-    ],
-  },
+  // {
+  //   id: 8,
+  //   name: "Outfit Generator",
+  //   model: "FLUX.1-dev-LoRA-Outfit-Generator",
+  //   url: "https://huggingface.co/tryonlabs/FLUX.1-dev-LoRA-Outfit-Generator",
+  //   description:
+  //     "Generates creative outfit designs for concept art and fashion.",
+  //   image: OutfitGenerator,
+  //   path: "https://huggingface.co/tryonlabs/FLUX.1-dev-LoRA-Outfit-Generator",
+  //   applyTrigger: (prompt) => prompt,
+  //   refinement:
+  //     "Change the prompt does that it describes a piece of clothing. You need to include each of the following details: color, pattern, fit, style, material, and type.",
+  //   scale: 1,
+  //   steps: 28,
+  //   suggestions: [
+  //     { label: "Leather jacket", prompt: "a leather jacket" },
+  //     { label: "Red dress", prompt: "a red dress" },
+  //     { label: "Scarf", prompt: "a silk scarf" },
+  //   ],
+  // },
 
-  {
-    id: 2,
-    name: "Simple Sketch",
-    model: "flux-lora-simple-illustration",
-    description: "Produces clean and minimalistic sketch-style artwork.",
-    url: "https://huggingface.co/dvyio/flux-lora-simple-illustration",
-    image: SimpleSketch,
-    path: "https://huggingface.co/dvyio/flux-lora-simple-illustration",
-    applyTrigger: (prompt) =>
-      `${prompt}, illustration in the style of SMPL, thick black lines on a white background`,
-    refinement: false,
-    scale: 1,
-    steps: 28,
-    suggestions: [
-      { label: "Woman", prompt: "a woman" },
-      { label: "Bicycle", prompt: "a bicycle" },
-      { label: "San Francisco", prompt: "the San Francisco skyline" },
-    ],
-  },
+  // {
+  //   id: 2,
+  //   name: "Simple Sketch",
+  //   model: "flux-lora-simple-illustration",
+  //   description: "Produces clean and minimalistic sketch-style artwork.",
+  //   url: "https://huggingface.co/dvyio/flux-lora-simple-illustration",
+  //   image: SimpleSketch,
+  //   path: "https://huggingface.co/dvyio/flux-lora-simple-illustration",
+  //   applyTrigger: (prompt) =>
+  //     `${prompt}, illustration in the style of SMPL, thick black lines on a white background`,
+  //   refinement: false,
+  //   scale: 1,
+  //   steps: 28,
+  //   suggestions: [
+  //     { label: "Woman", prompt: "a woman" },
+  //     { label: "Bicycle", prompt: "a bicycle" },
+  //     { label: "San Francisco", prompt: "the San Francisco skyline" },
+  //   ],
+  // },
   {
     id: 3,
     name: "Vector Sketch",

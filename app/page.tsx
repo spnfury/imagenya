@@ -26,6 +26,9 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import Header from "./header";
+import { Button } from "@/components/ui/button";
+import GithubIcon from "@/components/icons/github-icon";
+import XIcon from "@/components/icons/x-icon";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -93,12 +96,11 @@ export default function Home() {
           setSubmittedSeed(Math.floor(Math.random() * 9999999) + 1);
         }}
       >
-        <fieldset className="flex h-full grow flex-col md:flex-row">
-          <div className="bg-gray-100 md:max-w-sm">
+        <fieldset className="flex grow flex-col md:h-full md:flex-row md:overflow-hidden">
+          <div className="w-full bg-gray-100 md:max-w-sm md:overflow-y-auto">
             <div className="mt-4 md:hidden">
               <Header />
             </div>
-
             <div className="mt-4 flex w-full flex-col border-t border-gray-300 p-5 md:mt-0 md:border-b md:border-t-0">
               <label className="text-xs font-medium">
                 <a
@@ -119,7 +121,6 @@ export default function Home() {
                 onChange={(e) => saveAPIKey(e.target.value)}
               />
             </div>
-
             <div className="p-5">
               <div className="flex flex-col gap-8">
                 <div>
@@ -168,13 +169,11 @@ export default function Home() {
                               </div>
                             </div> */}
                           </div>
-
                           <div className="invisible absolute left-2 top-2 group-hover:visible">
                             <a href={lora.url} target="_blank" className="">
                               <InformationCircleIcon className="size-4 rounded-full bg-white text-black opacity-50 hover:opacity-100" />
                             </a>
                           </div>
-
                           <RadioGroup.Indicator className="absolute right-2 top-2">
                             <CheckCircleIcon className="size-5 rounded-full bg-white text-black" />
                           </RadioGroup.Indicator>
@@ -183,7 +182,6 @@ export default function Home() {
                     ))}
                   </RadioGroup.Root>
                 </div>
-
                 <div>
                   <p className="font-mono font-medium tracking-tight">
                     Describe your image
@@ -219,7 +217,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
               <div className="mt-12">
                 <button
                   disabled={isFetching}
@@ -233,8 +230,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="w-full px-4">
-            <div className="mx-auto flex h-full max-w-lg flex-col">
+          <div className="flex min-h-dvh w-full flex-col px-4">
+            <div className="mx-auto flex h-full max-w-lg grow flex-col">
               <div className="mt-4 hidden md:block">
                 <Header />
               </div>
@@ -318,63 +315,65 @@ export default function Home() {
                 </MotionConfig>
               </div>
             </div>
+            <footer className="mt-16 w-full items-center pb-10 text-center text-xs text-gray-600 md:mt-4 md:flex md:justify-between md:pb-5">
+              <p>
+                Powered by{" "}
+                <a
+                  href="https://togetherai.link"
+                  target="_blank"
+                  className="font-bold transition hover:text-blue-500"
+                >
+                  Together.ai
+                </a>
+                ,{" "}
+                <a
+                  href="https://huggingface.co/"
+                  target="_blank"
+                  className="font-bold transition hover:text-blue-500"
+                >
+                  HuggingFace
+                </a>
+                , &{" "}
+                <a
+                  href="https://togetherai.link/together-flux"
+                  target="_blank"
+                  className="font-bold transition hover:text-blue-500"
+                >
+                  Flux
+                </a>
+              </p>
+
+              <div className="mt-8 flex items-center justify-center md:mt-0 md:justify-between md:gap-6">
+                <div className="flex gap-6 md:gap-2">
+                  <a
+                    href="https://github.com/Nutlope/loras-dev"
+                    target="_blank"
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="inline-flex items-center gap-2"
+                    >
+                      <GithubIcon className="size-4" />
+                      GitHub
+                    </Button>
+                  </a>
+                  <a href="https://x.com/nutlope" target="_blank">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="inline-flex items-center gap-2"
+                    >
+                      <XIcon className="size-3" />
+                      Twitter
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </footer>
           </div>
         </fieldset>
       </form>
-
-      {/* <footer className="mt-16 w-full items-center pb-10 text-center text-xs text-gray-600 md:mt-4 md:flex md:justify-between md:pb-5">
-        <p>
-          Powered by{" "}
-          <a
-            href="https://togetherai.link"
-            target="_blank"
-            className="font-bold transition hover:text-blue-500"
-          >
-            Together.ai
-          </a>
-          ,{" "}
-          <a
-            href="https://huggingface.co/"
-            target="_blank"
-            className="font-bold transition hover:text-blue-500"
-          >
-            HuggingFace
-          </a>
-          , &{" "}
-          <a
-            href="https://togetherai.link/together-flux"
-            target="_blank"
-            className="font-bold transition hover:text-blue-500"
-          >
-            Flux
-          </a>
-        </p>
-
-        <div className="mt-8 flex items-center justify-center md:mt-0 md:justify-between md:gap-6">
-          <div className="flex gap-6 md:gap-2">
-            <a href="https://github.com/Nutlope/loras-dev" target="_blank">
-              <Button
-                variant="outline"
-                size="sm"
-                className="inline-flex items-center gap-2"
-              >
-                <GithubIcon className="size-4" />
-                GitHub
-              </Button>
-            </a>
-            <a href="https://x.com/nutlope" target="_blank">
-              <Button
-                size="sm"
-                variant="outline"
-                className="inline-flex items-center gap-2"
-              >
-                <XIcon className="size-3" />
-                Twitter
-              </Button>
-            </a>
-          </div>
-        </div>
-      </footer> */}
     </div>
   );
 }
