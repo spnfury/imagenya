@@ -13,15 +13,19 @@ import {
 } from "@/components/ui/dialog";
 import { Lora, LORAS } from "@/data/loras";
 import imagePlaceholder from "@/public/image-placeholder.png";
-import logo from "@/public/logo.png";
+import {
+  CheckCircleIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/20/solid";
+import { ArrowDownIcon, CodeBracketIcon } from "@heroicons/react/16/solid";
 import { ArrowUpRightIcon } from "@heroicons/react/24/solid";
-import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { useQuery } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import Header from "./header";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -90,8 +94,12 @@ export default function Home() {
         }}
       >
         <fieldset className="flex h-full grow flex-col md:flex-row">
-          <div className="max-w-sm bg-gray-100">
-            <div className="flex w-full flex-col border-b border-gray-300 p-5 max-md:mt-4">
+          <div className="bg-gray-100 md:max-w-sm">
+            <div className="mt-4 md:hidden">
+              <Header />
+            </div>
+
+            <div className="mt-4 flex w-full flex-col border-t border-gray-300 p-5 md:mt-0 md:border-b md:border-t-0">
               <label className="text-xs font-medium">
                 <a
                   href="https://api.together.xyz/settings/api-keys"
@@ -141,7 +149,7 @@ export default function Home() {
                                 src={lora.image}
                                 alt={lora.name}
                               />
-                              <div className="absolute inset-0 rounded-[4px] ring-1 ring-inset ring-black/10 group-hover:ring-black/20" />
+                              <div className="absolute inset-0 rounded-[4px] ring-1 ring-inset ring-black/10 group-hover:ring-black/20 group-data-[state=checked]:ring-black/50" />
                               <div className="absolute bottom-1.5 right-1.5 rounded-sm bg-white/60 px-1.5 pb-1 pt-0.5 leading-[13px] shadow-sm backdrop-blur-[2px]">
                                 <span className="text-xs font-medium leading-none text-gray-900">
                                   {lora.name}
@@ -160,8 +168,15 @@ export default function Home() {
                               </div>
                             </div> */}
                           </div>
+
+                          <div className="invisible absolute left-2 top-2 group-hover:visible">
+                            <a href={lora.url} target="_blank" className="">
+                              <InformationCircleIcon className="size-4 rounded-full bg-white text-black opacity-50 hover:opacity-100" />
+                            </a>
+                          </div>
+
                           <RadioGroup.Indicator className="absolute right-2 top-2">
-                            <CheckCircleIcon className="size-6 rounded-full bg-white text-black" />
+                            <CheckCircleIcon className="size-5 rounded-full bg-white text-black" />
                           </RadioGroup.Indicator>
                         </RadioGroup.Item>
                       </div>
@@ -218,81 +233,89 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="w-full">
+          <div className="w-full px-4">
             <div className="mx-auto flex h-full max-w-lg flex-col">
-              <div className="mt-4 flex flex-col items-center">
-                <a href="https://togetherai.link" target="_blank">
-                  <Image alt="" className="h-8 w-auto" src={logo} />
-                </a>
-                <p className="font-mono text-gray-600">
-                  Generate AI Images with LoRAs
-                </p>
+              <div className="mt-4 hidden md:block">
+                <Header />
               </div>
 
-              <div className="flex grow flex-col justify-center">
-                <div>
-                  {submittedPrompt && submittedLora && submittedSeed ? (
-                    <AnimatePresence mode="wait">
-                      {isFetching ? (
-                        <motion.div
-                          key="a"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          style={{
-                            aspectRatio:
-                              submittedLora?.width && submittedLora?.height
-                                ? submittedLora.width / submittedLora.height
-                                : 4 / 3,
-                          }}
-                          className="flex h-auto max-w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 shadow-sm"
-                        >
-                          <Spinner className="size-4" />
-                          Generating...
-                        </motion.div>
-                      ) : data ? (
-                        <motion.div
-                          key="b"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                        >
-                          <Image
-                            placeholder="blur"
-                            blurDataURL={imagePlaceholder.blurDataURL}
-                            width={submittedLora?.width ?? 1024}
-                            height={submittedLora?.height ?? 768}
-                            src={`data:image/png;base64,${data.image.b64_json}`}
-                            alt=""
-                            className={`${isFetching ? "animate-pulse" : ""} max-w-full rounded-lg border border-gray-200 object-cover shadow-sm`}
-                          />
-                          <div className="mt-2 text-center text-sm">
-                            <p className="text-gray-700">
-                              {submittedLora.name}
-                            </p>
-                            <p className="mt-1 text-gray-400">
-                              {data.prompt}{" "}
-                              <ShowCodeButton
-                                submittedPrompt={submittedPrompt}
-                                prompt={data.prompt}
-                                lora={submittedLora}
-                                seed={submittedSeed}
+              <div className="flex grow flex-col justify-center py-8 md:py-0">
+                <MotionConfig transition={{ duration: 0.2 }}>
+                  <div>
+                    {submittedPrompt && submittedLora && submittedSeed ? (
+                      <AnimatePresence mode="wait">
+                        {isFetching ? (
+                          <motion.div
+                            key="a"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            style={{
+                              aspectRatio:
+                                submittedLora?.width && submittedLora?.height
+                                  ? submittedLora.width / submittedLora.height
+                                  : 4 / 3,
+                            }}
+                            className="flex h-auto max-w-full items-center justify-center gap-2 rounded-lg text-gray-500"
+                          >
+                            <Spinner className="size-4" />
+                            Generating...
+                          </motion.div>
+                        ) : data ? (
+                          <motion.div
+                            key="b"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            <div className="relative">
+                              <Image
+                                placeholder="blur"
+                                blurDataURL={imagePlaceholder.blurDataURL}
+                                width={submittedLora?.width ?? 1024}
+                                height={submittedLora?.height ?? 768}
+                                src={`data:image/png;base64,${data.image.b64_json}`}
+                                alt=""
+                                className={`${isFetching ? "animate-pulse" : ""} max-w-full border border-gray-200 object-cover`}
                               />
-                            </p>
-                          </div>
-                        </motion.div>
-                      ) : null}
-                    </AnimatePresence>
-                  ) : (
-                    <div className="flex aspect-[4/3] items-center justify-center">
-                      <p className="text-balance px-4 text-center text-gray-500">
-                        Choose from expertly crafted styles or bring your own
-                        LoRA. Enter your prompt, select a style, and bring your
-                        imagination to life.
-                      </p>
-                    </div>
-                  )}
-                </div>
+
+                              <div className="absolute inset-x-2 bottom-2 flex items-center justify-end gap-2">
+                                <ShowCodeButton
+                                  submittedPrompt={submittedPrompt}
+                                  prompt={data.prompt}
+                                  lora={submittedLora}
+                                  seed={submittedSeed}
+                                />
+                                <a
+                                  href={`data:image/png;base64,${data.image.b64_json}`}
+                                  title="Download this image"
+                                  download="image.jpg"
+                                  className="rounded-md bg-white px-2.5 py-1.5 text-xs font-medium text-gray-500 opacity-75 shadow-sm shadow-gray-500/20 transition hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+                                >
+                                  <ArrowDownIcon className="size-4" />
+                                </a>
+                              </div>
+                            </div>
+
+                            <div className="mt-2 text-center text-sm">
+                              <p className="mt-1 text-gray-400">
+                                {data.prompt}
+                              </p>
+                            </div>
+                          </motion.div>
+                        ) : null}
+                      </AnimatePresence>
+                    ) : (
+                      <div className="flex aspect-[4/3] items-center justify-center">
+                        <p className="text-balance px-4 text-center text-gray-500">
+                          Choose from expertly crafted styles or bring your own
+                          LoRA. Enter your prompt, select a style, and bring
+                          your imagination to life.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </MotionConfig>
               </div>
             </div>
           </div>
@@ -402,8 +425,11 @@ function ShowCodeButton({
 
   return (
     <Dialog open={isShowingDialog} onOpenChange={setIsShowingDialog}>
-      <DialogTrigger className="text-cyan-600 underline">
-        Show code
+      <DialogTrigger
+        className="rounded-md bg-white px-2.5 py-1.5 text-xs font-medium text-gray-500 opacity-75 shadow-sm shadow-gray-500/20 transition hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+        title="View code sample"
+      >
+        <CodeBracketIcon className="size-4" />
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Code sample</DialogTitle>
