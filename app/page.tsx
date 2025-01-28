@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Lora, LORAS } from "@/data/loras";
 import imagePlaceholder from "@/public/image-placeholder.png";
+import heroImage from "@/public/hero-image.png";
 import {
   CheckCircleIcon,
   InformationCircleIcon,
@@ -294,12 +295,26 @@ export default function Home() {
                         ) : null}
                       </AnimatePresence>
                     ) : (
-                      <div className="flex aspect-[4/3] items-center justify-center">
-                        <p className="text-balance px-4 text-center text-gray-500">
-                          Choose from expertly crafted styles or bring your own
-                          LoRA. Enter your prompt, select a style, and bring
-                          your imagination to life.
-                        </p>
+                      <div className="flex flex-col items-center justify-center text-center">
+                        <div className="flex scale-125 items-center justify-center">
+                          <Image
+                            className="h-full w-auto"
+                            alt=""
+                            src={heroImage}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-white/20 to-white" />
+                        </div>
+
+                        <div className="relative mt-2">
+                          <h1 className="text-balance text-4xl font-semibold tracking-tight">
+                            Create stylized images in seconds
+                          </h1>
+                          <p className="mt-3 text-balance px-4 text-center text-gray-500">
+                            Choose from expertly crafted styles or bring your
+                            own LoRA. Enter your prompt, select a style, and
+                            bring your imagination to life.
+                          </p>
+                        </div>
                       </div>
                     )}
                   </div>
