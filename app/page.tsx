@@ -168,6 +168,7 @@ export default function Home() {
                       onChange={(e) => setPrompt(e.target.value)}
                       className="block w-full resize-none rounded-md border border-gray-300 bg-white px-4 py-3 text-sm text-gray-600 placeholder-gray-400 hover:border-gray-400/70 focus:outline focus:outline-2 focus:-outline-offset-1 focus:outline-blue-500"
                     />
+
                     {selectedLora && (
                       <div className="absolute inset-x-2 bottom-2 flex items-center">
                         <div className="mt-2 flex flex-wrap gap-2">
@@ -222,13 +223,13 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex w-full flex-col px-4 md:min-h-dvh">
-            <div className="mx-auto flex h-full max-w-lg grow flex-col">
+          <div className="flex w-full flex-col px-4 md:min-h-dvh md:overflow-y-auto">
+            <div className="mx-auto flex max-w-lg grow flex-col">
               <div className="mt-4 hidden md:block">
                 <Header />
               </div>
 
-              <div className="flex grow flex-col justify-center py-8 md:py-0">
+              <div className="flex grow flex-col justify-center py-8">
                 <MotionConfig transition={{ duration: 0.2 }}>
                   <div>
                     {submittedPrompt && submittedLora && submittedSeed ? (
