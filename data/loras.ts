@@ -44,14 +44,14 @@ export const LORAS: Lora[] = [
     height: 832,
     width: 1280,
     suggestions: [
-      { label: "Flaming red torch", prompt: "A flaming red torch" },
+      { label: "Red torch", prompt: "A flaming red torch" },
       { label: "Brown briefcase", prompt: "A brown briefcase" },
       { label: "Snow globe", prompt: "A snow globe" },
     ],
   },
   {
     id: 6,
-    name: "Logo Design",
+    name: "Logos",
     model: "FLUX.1-dev-LoRA-Logo-Design",
     description: "Tailored for professional and minimalist logo creation.",
     url: "https://huggingface.co/Shakker-Labs/FLUX.1-dev-LoRA-Logo-Design",
@@ -72,29 +72,8 @@ export const LORAS: Lora[] = [
     ],
   },
   {
-    id: 1,
-    name: "Colored Sketch",
-    model: "Flux-Sketch-Ep-LoRA",
-    description: "Creates vibrant, colorful sketch-style illustrations.",
-    url: "https://huggingface.co/strangerzonehf/Flux-Sketch-Ep-LoRA",
-    image: ColoredSketch,
-    path: "https://huggingface.co/strangerzonehf/Flux-Sketch-Ep-LoRA",
-    applyTrigger: (prompt) => `ep sketch, ${prompt}`,
-    refinement:
-      "Refine the prompt so that it describes a vibrant, colorful, sketch illustration.",
-    scale: 1,
-    steps: 33,
-    height: 832,
-    width: 1280,
-    suggestions: [
-      { label: "Albert Einstein", prompt: "Albert Einstein" },
-      { label: "New York City", prompt: "New York City" },
-      { label: "Space adventure", prompt: "Space adventure" },
-    ],
-  },
-  {
     id: 7,
-    name: "Flux MidJourney",
+    name: "Midjourney",
     model: "Flux-Midjourney-Mix2-LoRA",
     url: "https://huggingface.co/strangerzonehf/Flux-Midjourney-Mix2-LoRA",
     description:
@@ -121,7 +100,25 @@ export const LORAS: Lora[] = [
       },
     ],
   },
-
+  {
+    id: 10,
+    name: "Tarot Card",
+    model: "flux-tarot-v1",
+    url: "https://huggingface.co/multimodalart/flux-tarot-v1",
+    description: "Produces artistic, mystical tarot card designs.",
+    image: TarotCard,
+    path: "https://huggingface.co/multimodalart/flux-tarot-v1",
+    applyTrigger: (prompt) =>
+      `${prompt}, in the style of TOK a trtcrd tarot style`,
+    refinement: false,
+    scale: 1,
+    steps: 28,
+    suggestions: [
+      { label: "Wheel of fortune", prompt: "the wheel of fortune" },
+      { label: "Kangaroo", prompt: "a kangaroo" },
+      { label: "Moon", prompt: "the moon" },
+    ],
+  },
   {
     id: 8,
     name: "Outfit Generator",
@@ -142,6 +139,7 @@ export const LORAS: Lora[] = [
       { label: "Scarf", prompt: "a silk scarf" },
     ],
   },
+
   {
     id: 2,
     name: "Simple Sketch",
@@ -181,6 +179,28 @@ export const LORAS: Lora[] = [
       { label: "Lamp", prompt: "a vintage lamp" },
     ],
   },
+
+  {
+    id: 1,
+    name: "Colored Sketch",
+    model: "Flux-Sketch-Ep-LoRA",
+    description: "Creates vibrant, colorful sketch-style illustrations.",
+    url: "https://huggingface.co/strangerzonehf/Flux-Sketch-Ep-LoRA",
+    image: ColoredSketch,
+    path: "https://huggingface.co/strangerzonehf/Flux-Sketch-Ep-LoRA",
+    applyTrigger: (prompt) => `ep sketch, ${prompt}`,
+    refinement:
+      "Refine the prompt so that it describes a vibrant, colorful, sketch illustration.",
+    scale: 1,
+    steps: 33,
+    height: 832,
+    width: 1280,
+    suggestions: [
+      { label: "Albert Einstein", prompt: "Albert Einstein" },
+      { label: "New York City", prompt: "New York City" },
+      { label: "Space", prompt: "Space adventure" },
+    ],
+  },
   {
     id: 4,
     name: "Pencil Sketch",
@@ -217,25 +237,6 @@ export const LORAS: Lora[] = [
       { label: "Young man", prompt: "a young man with glasses" },
       { label: "Paper cranes", prompt: "a flock of paper cranes" },
       { label: "Flower", prompt: "a flower blooming" },
-    ],
-  },
-  {
-    id: 10,
-    name: "Tarot Card",
-    model: "flux-tarot-v1",
-    url: "https://huggingface.co/multimodalart/flux-tarot-v1",
-    description: "Produces artistic, mystical tarot card designs.",
-    image: TarotCard,
-    path: "https://huggingface.co/multimodalart/flux-tarot-v1",
-    applyTrigger: (prompt) =>
-      `${prompt}, in the style of TOK a trtcrd tarot style`,
-    refinement: false,
-    scale: 1,
-    steps: 28,
-    suggestions: [
-      { label: "Wheel of fortune", prompt: "the wheel of fortune" },
-      { label: "Kangaroo", prompt: "a kangaroo" },
-      { label: "Moon", prompt: "the moon" },
     ],
   },
 ];
