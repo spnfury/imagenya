@@ -358,6 +358,7 @@ export default function Home() {
                     <Button
                       variant="outline"
                       size="sm"
+                      type="button"
                       className="inline-flex items-center gap-2"
                     >
                       <GithubIcon className="size-4" />
@@ -368,6 +369,7 @@ export default function Home() {
                     <Button
                       size="sm"
                       variant="outline"
+                      type="button"
                       className="inline-flex items-center gap-2"
                     >
                       <XIcon className="size-3" />
